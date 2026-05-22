@@ -9,6 +9,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     static readonly int GlowColorId = Shader.PropertyToID("_GlowColor");
     static readonly int GlowIntensityId = Shader.PropertyToID("_GlowIntensity");
     static readonly int LiquidUpId = Shader.PropertyToID("_LiquidUp");
+    static readonly int LiquidOffsetId = Shader.PropertyToID("_LiquidOffset");
     static readonly int SloshId = Shader.PropertyToID("_Slosh");
     static readonly int WaveAmountId = Shader.PropertyToID("_WaveAmount");
     static readonly int LiquidRadiusId = Shader.PropertyToID("_LiquidRadius");
@@ -27,16 +28,23 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     [Header("Motion")]
     [SerializeField] Rigidbody2D targetRigidbody;
     [Range(0f, 0.18f)] [SerializeField] float waveAmount = 0.035f;
+    [SerializeField] float velocityToSlosh = 0.025f;
+    [SerializeField] float velocityToOffset = 0.012f;
     [SerializeField] float accelerationToSlosh = 0.035f;
     [SerializeField] float angularVelocityToSlosh = 0.0025f;
     [SerializeField] float collisionImpulseToSlosh = 0.018f;
     [SerializeField] float sloshSpring = 28f;
     [SerializeField] float sloshDamping = 7f;
+    [SerializeField] float offsetSpring = 18f;
+    [SerializeField] float offsetDamping = 5f;
     [SerializeField] float maxSlosh = 0.55f;
+    [SerializeField] float maxLiquidOffset = 0.09f;
 
     SpriteRenderer spriteRenderer;
     MaterialPropertyBlock propertyBlock;
     Vector2 previousVelocity;
+    Vector2 liquidOffset;
+    Vector2 liquidOffsetVelocity;
     float slosh;
     float sloshVelocity;
 
@@ -74,12 +82,18 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         Vector2 acceleration = fixedDeltaTime > 0f ? (velocity - previousVelocity) / fixedDeltaTime : Vector2.zero;
         previousVelocity = velocity;
 
+        Vector2 localVelocity = transform.InverseTransformDirection(velocity);
         Vector2 localAcceleration = transform.InverseTransformDirection(acceleration);
-        float target = (-localAcceleration.x * accelerationToSlosh) + (-targetRigidbody.angularVelocity * angularVelocityToSlosh);
+        float target = (-localVelocity.x * velocityToSlosh) + (-localAcceleration.x * accelerationToSlosh) + (-targetRigidbody.angularVelocity * angularVelocityToSlosh);
 
         sloshVelocity += (target - slosh) * sloshSpring * fixedDeltaTime;
         sloshVelocity -= sloshVelocity * sloshDamping * fixedDeltaTime;
         slosh = Mathf.Clamp(slosh + sloshVelocity * fixedDeltaTime, -maxSlosh, maxSlosh);
+
+        Vector2 targetOffset = Vector2.ClampMagnitude(-localVelocity * velocityToOffset, maxLiquidOffset);
+        liquidOffsetVelocity += (targetOffset - liquidOffset) * offsetSpring * fixedDeltaTime;
+        liquidOffsetVelocity -= liquidOffsetVelocity * offsetDamping * fixedDeltaTime;
+        liquidOffset = Vector2.ClampMagnitude(liquidOffset + liquidOffsetVelocity * fixedDeltaTime, maxLiquidOffset);
     }
 
     void LateUpdate()
@@ -104,6 +118,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         edgeSoftness = Mathf.Clamp(edgeSoftness, 0.001f, 0.08f);
         waveAmount = Mathf.Clamp(waveAmount, 0f, 0.18f);
         maxSlosh = Mathf.Max(0f, maxSlosh);
+        maxLiquidOffset = Mathf.Max(0f, maxLiquidOffset);
 
         if (Application.isPlaying == false)
         {
@@ -132,6 +147,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         propertyBlock.SetFloat(GlowIntensityId, glowIntensity);
         propertyBlock.SetFloat(WaveAmountId, waveAmount);
         propertyBlock.SetVector(LiquidUpId, new Vector4(liquidUp.x, liquidUp.y, 0f, 0f));
+        propertyBlock.SetVector(LiquidOffsetId, new Vector4(liquidOffset.x, liquidOffset.y, 0f, 0f));
         propertyBlock.SetFloat(SloshId, slosh);
         spriteRenderer.SetPropertyBlock(propertyBlock);
     }

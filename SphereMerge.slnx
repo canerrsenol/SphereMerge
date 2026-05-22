@@ -5,8 +5,8 @@
   <Project Path="UniTask.Addressables.csproj" />
   <Project Path="LeanTouch.csproj" />
   <Project Path="PrimeTween.Demo.csproj" />
-  <Project Path="CW.Common.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="CW.Common.csproj" />
   <Project Path="UniTask.TextMeshPro.csproj" />
   <Project Path="UniTask.Editor.csproj" />
   <Project Path="Sirenix.OdinInspector.Modules.UnityMathematics.csproj" />

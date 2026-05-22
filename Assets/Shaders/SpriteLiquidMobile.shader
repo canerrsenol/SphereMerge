@@ -15,6 +15,7 @@ Shader "SphereMerge/Sprite Liquid Mobile"
         _GlowIntensity ("Glow Intensity", Range(0,4)) = 1
         _RimGlow ("Rim Glow", Range(0,1)) = 0.15
         [HideInInspector] _LiquidUp ("Liquid Up", Vector) = (0,1,0,0)
+        [HideInInspector] _LiquidOffset ("Liquid Offset", Vector) = (0,0,0,0)
         [HideInInspector] _Slosh ("Slosh", Float) = 0
         [HideInInspector] _RendererColor ("Renderer Color", Color) = (1,1,1,1)
         [HideInInspector] _Flip ("Flip", Vector) = (1,1,1,1)
@@ -75,6 +76,7 @@ Shader "SphereMerge/Sprite Liquid Mobile"
             half _GlowIntensity;
             half _RimGlow;
             half4 _LiquidUp;
+            half4 _LiquidOffset;
             half _Slosh;
             half _EnableExternalAlpha;
         CBUFFER_END
@@ -106,13 +108,14 @@ Shader "SphereMerge/Sprite Liquid Mobile"
             sprite.a = lerp(sprite.a, externalAlpha * input.color.a, _EnableExternalAlpha);
 
             half2 centered = input.uv - half2(0.5h, 0.5h);
+            half2 liquidCentered = centered - _LiquidOffset.xy;
             half upLengthSquared = max(dot(_LiquidUp.xy, _LiquidUp.xy), 0.001h);
             half2 up = _LiquidUp.xy * rsqrt(upLengthSquared);
             half2 right = half2(up.y, -up.x);
 
-            half wave = sin((dot(centered, right) + _Time.y * 0.85h) * _WaveFrequency) * _WaveAmount * saturate(abs(_Slosh));
+            half wave = sin((dot(liquidCentered, right) + _Time.y * 0.85h) * _WaveFrequency) * _WaveAmount * saturate(abs(_Slosh));
             half height = (_FillAmount - 0.5h) + wave;
-            half surface = height - dot(centered, up);
+            half surface = height - dot(liquidCentered, up);
             half liquidMask = smoothstep(-_SurfaceSoftness, _SurfaceSoftness, surface);
             half innerMask = 1.0h - smoothstep(_LiquidRadius - _EdgeSoftness, _LiquidRadius, length(centered));
 

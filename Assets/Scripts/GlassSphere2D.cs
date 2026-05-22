@@ -1,16 +1,29 @@
 using UnityEngine;
 
-public class GlassSphere2D : MonoBehaviour
+[RequireComponent(typeof(Rigidbody2D))]
+public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private const float SelectedGravityScale = 1f;
+
+    [SerializeField] private bool canSelect = true;
+
+    private Rigidbody2D _rigidbody2D;
+
+    public bool CanSelect => canSelect;
+
+    private void Awake()
     {
-        
+        _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void OnSelect()
     {
-        
+        if (!canSelect)
+        {
+            return;
+        }
+
+        canSelect = false;
+        _rigidbody2D.gravityScale = SelectedGravityScale;
     }
 }
