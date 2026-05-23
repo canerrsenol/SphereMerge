@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using PrimeTween;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
@@ -7,18 +8,39 @@ using UnityEngine.Serialization;
 
 public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerService
 {
+    private const float DefaultIntroDuration = 0.25f;
+    private const float DefaultIntroStagger = 0.03f;
+    private const Ease DefaultIntroEase = Ease.OutBack;
+
     [SerializeField] private GlassSphere2D spherePrefab;
-    [SerializeField, UnityEngine.HideInInspector] private Vector2Int gridSize;
+    [SerializeField, HideInInspector] private Vector2Int gridSize;
     [FormerlySerializedAs("spacing")]
-    [SerializeField, UnityEngine.HideInInspector] private Vector2 tileOffset = Vector2.one;
-    [SerializeField, UnityEngine.HideInInspector] private Vector2Int storedGridSize;
-    [OdinSerialize, UnityEngine.HideInInspector] private GlassSphere2D[,] spheres = new GlassSphere2D[0, 0];
+    [SerializeField, HideInInspector] private Vector2 tileOffset = Vector2.one;
+    [SerializeField] private SphereIntroAnimationSettingsSO introAnimationSettings;
+    [SerializeField, HideInInspector] private Vector2Int storedGridSize;
+    [OdinSerialize, HideInInspector] private GlassSphere2D[,] spheres = new GlassSphere2D[0, 0];
+
+    private Sequence introSequence;
 
     public GlassSphere2D SpherePrefab => spherePrefab;
     public Vector2Int GridSize => gridSize;
     public Vector2 TileOffset => tileOffset;
     public bool IsGridSizeValid => gridSize.x > 0 && gridSize.y > 0;
-    public int CellCount => IsGridSizeValid ? gridSize.x * gridSize.y : 0;
+
+    private void Start()
+    {
+        PlayIntroAnimation();
+    }
+
+    private void OnDestroy()
+    {
+        if (introSequence.isAlive)
+        {
+            introSequence.Stop();
+        }
+
+        introSequence = default;
+    }
 
     private void OnValidate()
     {
@@ -42,11 +64,6 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         }
     }
 
-    public void CenterTransformToGrid()
-    {
-        AlignTransformToGrid(GetGridTopLocalY());
-    }
-
     public float GetGridTopLocalY()
     {
         if (!IsGridSizeValid)
@@ -57,7 +74,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         return transform.localPosition.y + GetGridEdgeOffset(gridSize.y, Mathf.Abs(tileOffset.y));
     }
 
-    public void AlignTransformToGrid(float topLocalY)
+    private void AlignTransformToGrid(float topLocalY)
     {
         if (!IsGridSizeValid)
         {
@@ -95,16 +112,6 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         }
     }
 
-    public void ClearCellData(Vector2Int position)
-    {
-        if (!TryGetArrayPosition(position, out int x, out int y))
-        {
-            return;
-        }
-
-        spheres[x, y] = null;
-    }
-
     public void ClearGridData()
     {
         EnsureGridDataSize();
@@ -130,18 +137,6 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
             && position.y >= 0
             && position.x < gridSize.x
             && position.y < gridSize.y;
-    }
-
-    public bool TryGetIndex(Vector2Int position, out int index)
-    {
-        if (!IsPositionValid(position))
-        {
-            index = -1;
-            return false;
-        }
-
-        index = position.y * gridSize.x + position.x;
-        return true;
     }
 
     public void EnsureGridDataSize()
@@ -255,6 +250,46 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
                 {
                     sphereTransform.localPosition = GetLocalPosition(new Vector2Int(x, y));
                 }
+            }
+        }
+    }
+
+    private void PlayIntroAnimation()
+    {
+        if (!IsGridSizeValid || spheres == null)
+        {
+            return;
+        }
+
+        introSequence = Sequence.Create();
+
+        float duration = introAnimationSettings != null ? introAnimationSettings.Duration : DefaultIntroDuration;
+        float stagger = introAnimationSettings != null ? introAnimationSettings.Stagger : DefaultIntroStagger;
+        Ease ease = introAnimationSettings != null ? introAnimationSettings.Ease : DefaultIntroEase;
+
+        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
+        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GlassSphere2D sphere = spheres[x, y];
+                if (sphere == null)
+                {
+                    continue;
+                }
+
+                Transform sphereTransform = sphere.transform;
+                Vector3 targetScale = sphereTransform.localScale;
+                sphereTransform.localScale = Vector3.zero;
+
+                introSequence.Group(Tween.Scale(
+                    sphereTransform,
+                    targetScale,
+                    duration,
+                    ease,
+                    startDelay: (x + y) * stagger));
             }
         }
     }

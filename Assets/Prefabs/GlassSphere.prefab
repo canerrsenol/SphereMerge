@@ -202,3 +202,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlassSphere2D
   canSelect: 1
+  sphereColor: 0
