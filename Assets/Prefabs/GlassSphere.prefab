@@ -167,25 +167,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpriteLiquid2D
   targetRenderer: {fileID: 1139133706837655801}
+  targetRigidbody: {fileID: 795770790887750142}
+  motionSettings: {fileID: 11400000, guid: 8e084a3a90624696b28ebd44158bb1fd, type: 2}
   fillAmount: 0.5
   liquidColor: {r: 0.106308244, g: 0.15295655, b: 0.89433956, a: 0.87}
-  liquidRadius: 0.47
-  edgeSoftness: 0.015
   glowColor: {r: 0.106308244, g: 0.15295655, b: 0.89433956, a: 1}
   glowIntensity: 1.89
-  targetRigidbody: {fileID: 795770790887750142}
-  waveAmount: 0.125
-  velocityToSlosh: 0.025
-  velocityToOffset: 0.33
-  accelerationToSlosh: 0.035
-  angularVelocityToSlosh: 0.0025
-  collisionImpulseToSlosh: 0.018
-  sloshSpring: 28
-  sloshDamping: 7
-  offsetSpring: 18
-  offsetDamping: 5
-  maxSlosh: 0.8
-  maxLiquidOffset: 0.09
 --- !u!58 &3197306125530214791
 CircleCollider2D:
   m_ObjectHideFlags: 0

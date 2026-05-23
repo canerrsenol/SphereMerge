@@ -33,21 +33,15 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
-    - _EdgeSoftness: 0.015
     - _EnableExternalAlpha: 0
     - _FillAmount: 0.448
     - _GlowIntensity: 1
-    - _LiquidRadius: 0.47
-    - _RimGlow: 0.15
-    - _Slosh: 0
-    - _SurfaceSoftness: 0.018
-    - _WaveAmount: 0.035
-    - _WaveFrequency: 6
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _Flip: {r: 1, g: 1, b: 1, a: 1}
     - _GlowColor: {r: 0.25, g: 0.9, b: 1, a: 1}
     - _LiquidColor: {r: 0.08, g: 0.55, b: 1, a: 0.8666667}
+    - _LiquidOffset: {r: 0, g: 0, b: 0, a: 0}
     - _LiquidUp: {r: 0, g: 1, b: 0, a: 0}
     - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
   m_BuildTextureStacks: []

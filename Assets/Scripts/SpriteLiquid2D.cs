@@ -3,51 +3,40 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class SpriteLiquid2D : MonoBehaviour
 {
+    const float DefaultSpeedToTilt = 0.025f;
+    const float DefaultAccelerationToTilt = 0.035f;
+    const float DefaultAngularVelocityToTilt = 0.0025f;
+    const float DefaultCollisionToTilt = 0.018f;
+    const float DefaultSpring = 28f;
+    const float DefaultDamping = 7f;
+    const float DefaultMaxTilt = 0.65f;
+    const float DefaultSpeedToOffset = 0.12f;
+    const float DefaultMaxOffset = 0.07f;
+
     static readonly int FillAmountId = Shader.PropertyToID("_FillAmount");
     static readonly int LiquidColorId = Shader.PropertyToID("_LiquidColor");
     static readonly int GlowColorId = Shader.PropertyToID("_GlowColor");
     static readonly int GlowIntensityId = Shader.PropertyToID("_GlowIntensity");
     static readonly int LiquidUpId = Shader.PropertyToID("_LiquidUp");
     static readonly int LiquidOffsetId = Shader.PropertyToID("_LiquidOffset");
-    static readonly int SloshId = Shader.PropertyToID("_Slosh");
-    static readonly int WaveAmountId = Shader.PropertyToID("_WaveAmount");
-    static readonly int LiquidRadiusId = Shader.PropertyToID("_LiquidRadius");
-    static readonly int EdgeSoftnessId = Shader.PropertyToID("_EdgeSoftness");
 
-    [Header("Renderer")]
+    [Header("References")]
     [SerializeField] SpriteRenderer targetRenderer;
+    [SerializeField] Rigidbody2D targetRigidbody;
+    [SerializeField] SpriteLiquidMotionSettingsSO motionSettings;
 
     [Header("Liquid")]
     [Range(0f, 1f)] [SerializeField] float fillAmount = 0.5f;
     [SerializeField] Color liquidColor = new Color(0.08f, 0.55f, 1f, 0.82f);
-    [Range(0.1f, 0.7f)] [SerializeField] float liquidRadius = 0.47f;
-    [Range(0.001f, 0.08f)] [SerializeField] float edgeSoftness = 0.015f;
-
-    [Header("Glow")]
     [SerializeField] Color glowColor = new Color(0.25f, 0.9f, 1f, 1f);
     [Range(0f, 4f)] [SerializeField] float glowIntensity = 1f;
-
-    [Header("Motion")]
-    [SerializeField] Rigidbody2D targetRigidbody;
-    [Range(0f, 0.18f)] [SerializeField] float waveAmount = 0.035f;
-    [SerializeField] float velocityToSlosh = 0.025f;
-    [SerializeField] float velocityToOffset = 0.012f;
-    [SerializeField] float accelerationToSlosh = 0.035f;
-    [SerializeField] float angularVelocityToSlosh = 0.0025f;
-    [SerializeField] float collisionImpulseToSlosh = 0.018f;
-    [SerializeField] float sloshSpring = 28f;
-    [SerializeField] float sloshDamping = 7f;
-    [SerializeField] float offsetSpring = 18f;
-    [SerializeField] float offsetDamping = 5f;
-    [SerializeField] float maxSlosh = 0.55f;
-    [SerializeField] float maxLiquidOffset = 0.09f;
 
     MaterialPropertyBlock propertyBlock;
     Vector2 previousVelocity;
     Vector2 liquidOffset;
     Vector2 liquidOffsetVelocity;
-    float slosh;
-    float sloshVelocity;
+    float tilt;
+    float tiltVelocity;
 
     public float FillAmount
     {
@@ -83,6 +72,12 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         ApplyProperties();
     }
 
+    void Reset()
+    {
+        targetRigidbody = GetComponent<Rigidbody2D>();
+        CacheRenderer();
+    }
+
     void FixedUpdate()
     {
         if (targetRigidbody == null)
@@ -95,16 +90,20 @@ public sealed class SpriteLiquid2D : MonoBehaviour
 
         Vector2 localVelocity = transform.InverseTransformDirection(velocity);
         Vector2 localAcceleration = transform.InverseTransformDirection(acceleration);
-        float target = (-localVelocity.x * velocityToSlosh) + (-localAcceleration.x * accelerationToSlosh) + (-targetRigidbody.angularVelocity * angularVelocityToSlosh);
+        float targetTilt =
+            (-localVelocity.x * SpeedToTilt) +
+            (-localAcceleration.x * AccelerationToTilt) +
+            (-targetRigidbody.angularVelocity * AngularVelocityToTilt);
 
-        sloshVelocity += (target - slosh) * sloshSpring * fixedDeltaTime;
-        sloshVelocity -= sloshVelocity * sloshDamping * fixedDeltaTime;
-        slosh = Mathf.Clamp(slosh + sloshVelocity * fixedDeltaTime, -maxSlosh, maxSlosh);
+        float damping = Mathf.Exp(-Damping * fixedDeltaTime);
+        tiltVelocity += (targetTilt - tilt) * Spring * fixedDeltaTime;
+        tiltVelocity *= damping;
+        tilt = Mathf.Clamp(tilt + tiltVelocity * fixedDeltaTime, -MaxTilt, MaxTilt);
 
-        Vector2 targetOffset = Vector2.ClampMagnitude(-localVelocity * velocityToOffset, maxLiquidOffset);
-        liquidOffsetVelocity += (targetOffset - liquidOffset) * offsetSpring * fixedDeltaTime;
-        liquidOffsetVelocity -= liquidOffsetVelocity * offsetDamping * fixedDeltaTime;
-        liquidOffset = Vector2.ClampMagnitude(liquidOffset + liquidOffsetVelocity * fixedDeltaTime, maxLiquidOffset);
+        Vector2 targetOffset = Vector2.ClampMagnitude(-localVelocity * SpeedToOffset, MaxOffset);
+        liquidOffsetVelocity += (targetOffset - liquidOffset) * Spring * fixedDeltaTime;
+        liquidOffsetVelocity *= damping;
+        liquidOffset = Vector2.ClampMagnitude(liquidOffset + liquidOffsetVelocity * fixedDeltaTime, MaxOffset);
     }
 
     void LateUpdate()
@@ -118,18 +117,14 @@ public sealed class SpriteLiquid2D : MonoBehaviour
             return;
 
         Vector2 localNormal = transform.InverseTransformDirection(collision.GetContact(0).normal);
-        float impulse = collision.relativeVelocity.magnitude * collisionImpulseToSlosh;
-        sloshVelocity += Mathf.Clamp(-localNormal.x * impulse, -maxSlosh, maxSlosh);
+        float impulse = collision.relativeVelocity.magnitude * CollisionToTilt;
+        tiltVelocity += Mathf.Clamp(-localNormal.x * impulse, -MaxTilt, MaxTilt);
     }
 
     void OnValidate()
     {
         fillAmount = Mathf.Clamp01(fillAmount);
-        liquidRadius = Mathf.Clamp(liquidRadius, 0.1f, 0.7f);
-        edgeSoftness = Mathf.Clamp(edgeSoftness, 0.001f, 0.08f);
-        waveAmount = Mathf.Clamp(waveAmount, 0f, 0.18f);
-        maxSlosh = Mathf.Max(0f, maxSlosh);
-        maxLiquidOffset = Mathf.Max(0f, maxLiquidOffset);
+        glowIntensity = Mathf.Max(0f, glowIntensity);
 
         if (Application.isPlaying == false)
         {
@@ -179,18 +174,24 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         targetRenderer.GetPropertyBlock(propertyBlock);
 
         Vector2 worldUpInLocal = transform.InverseTransformDirection(Vector2.up);
-        Vector2 liquidUp = (worldUpInLocal + new Vector2(slosh, 0f)).normalized;
+        Vector2 liquidUp = (worldUpInLocal + new Vector2(tilt, 0f)).normalized;
 
         propertyBlock.SetFloat(FillAmountId, fillAmount);
         propertyBlock.SetColor(LiquidColorId, liquidColor);
-        propertyBlock.SetFloat(LiquidRadiusId, liquidRadius);
-        propertyBlock.SetFloat(EdgeSoftnessId, edgeSoftness);
         propertyBlock.SetColor(GlowColorId, glowColor);
         propertyBlock.SetFloat(GlowIntensityId, glowIntensity);
-        propertyBlock.SetFloat(WaveAmountId, waveAmount);
         propertyBlock.SetVector(LiquidUpId, new Vector4(liquidUp.x, liquidUp.y, 0f, 0f));
         propertyBlock.SetVector(LiquidOffsetId, new Vector4(liquidOffset.x, liquidOffset.y, 0f, 0f));
-        propertyBlock.SetFloat(SloshId, slosh);
         targetRenderer.SetPropertyBlock(propertyBlock);
     }
+
+    float SpeedToTilt => motionSettings != null ? motionSettings.SpeedToTilt : DefaultSpeedToTilt;
+    float AccelerationToTilt => motionSettings != null ? motionSettings.AccelerationToTilt : DefaultAccelerationToTilt;
+    float AngularVelocityToTilt => motionSettings != null ? motionSettings.AngularVelocityToTilt : DefaultAngularVelocityToTilt;
+    float CollisionToTilt => motionSettings != null ? motionSettings.CollisionToTilt : DefaultCollisionToTilt;
+    float Spring => motionSettings != null ? motionSettings.Spring : DefaultSpring;
+    float Damping => motionSettings != null ? motionSettings.Damping : DefaultDamping;
+    float MaxTilt => motionSettings != null ? motionSettings.MaxTilt : DefaultMaxTilt;
+    float SpeedToOffset => motionSettings != null ? motionSettings.SpeedToOffset : DefaultSpeedToOffset;
+    float MaxOffset => motionSettings != null ? motionSettings.MaxOffset : DefaultMaxOffset;
 }
