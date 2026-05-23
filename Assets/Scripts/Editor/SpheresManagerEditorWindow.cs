@@ -44,6 +44,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
 
         DrawGridSettings();
+        DrawSphereColorsField();
         EditorGUILayout.Space(8f);
 
         if (!spheresManager.IsGridSizeValid)
@@ -199,6 +200,28 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    private void DrawSphereColorsField()
+    {
+        EditorGUI.BeginChangeCheck();
+        SphereColorsSO sphereColors = (SphereColorsSO)EditorGUILayout.ObjectField(
+            "Sphere Colors",
+            spheresManager.SphereColors,
+            typeof(SphereColorsSO),
+            false);
+
+        if (!EditorGUI.EndChangeCheck())
+        {
+            return;
+        }
+
+        Undo.RecordObject(spheresManager, "Change Sphere Colors");
+        RecordChildLiquidObjects("Change Sphere Colors");
+        spheresManager.SetSphereColors(sphereColors);
+        MarkDirty(spheresManager);
+        MarkChildLiquidObjectsDirty();
+        Repaint();
+    }
+
     private void FillEmptyGridCells()
     {
         if (spheresManager == null || !spheresManager.IsGridSizeValid || spheresManager.SpherePrefab == null)
@@ -231,6 +254,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
                 MarkDirty(sphere.gameObject);
                 MarkDirty(sphere.transform);
                 MarkDirty(sphere);
+                MarkDirty(sphere.SpriteLiquid);
             }
         }
     }
@@ -328,6 +352,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
             Undo.RecordObject(sphere, undoName);
             Undo.RecordObject(sphere.transform, undoName);
             Undo.RecordObject(sphere.gameObject, undoName);
+            RecordLiquidObject(sphere, undoName);
             SetupSphere(sphere, position);
         }
 
@@ -338,6 +363,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         MarkDirty(sphere.gameObject);
         MarkDirty(sphere.transform);
         MarkDirty(sphere);
+        MarkDirty(sphere.SpriteLiquid);
         Repaint();
     }
 
@@ -379,6 +405,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
 
         sphere.name = $"Sphere_{position.x}_{position.y}";
         sphere.transform.localPosition = spheresManager.GetLocalPosition(position);
+        sphere.SetColorPalette(spheresManager.SphereColors);
     }
 
     private void ClearGrid()
@@ -458,22 +485,67 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), color);
     }
 
-    private static Color GetEditorColor(SphereColors color)
+    private Color GetEditorColor(SphereColors color)
     {
-        switch (color)
+        if (spheresManager != null && spheresManager.SphereColors != null)
         {
-            case SphereColors.Blue:
-                return new Color(0.1f, 0.58f, 0.92f, 1f);
-            case SphereColors.Yellow:
-                return new Color(1f, 0.82f, 0.18f, 1f);
-            case SphereColors.Purple:
-                return new Color(0.62f, 0.25f, 0.92f, 1f);
-            case SphereColors.Pink:
-                return new Color(1f, 0.25f, 0.68f, 1f);
-            case SphereColors.Brown:
-                return new Color(0.75f, 0.36f, 0.17f, 1f);
-            default:
-                return Color.gray;
+            Color paletteColor = spheresManager.SphereColors.GetLiquidColor(color);
+            paletteColor.a = 1f;
+            return paletteColor;
+        }
+
+        Color defaultColor = SphereColorsSO.GetDefaultLiquidColor(color);
+        defaultColor.a = 1f;
+        return defaultColor;
+    }
+
+    private void RecordChildLiquidObjects(string undoName)
+    {
+        if (spheresManager == null)
+        {
+            return;
+        }
+
+        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
+        for (int i = 0; i < childSpheres.Length; i++)
+        {
+            if (childSpheres[i] != null)
+            {
+                Undo.RecordObject(childSpheres[i], undoName);
+            }
+
+            RecordLiquidObject(childSpheres[i], undoName);
+        }
+    }
+
+    private static void RecordLiquidObject(GlassSphere2D sphere, string undoName)
+    {
+        if (sphere == null || sphere.SpriteLiquid == null)
+        {
+            return;
+        }
+
+        Undo.RecordObject(sphere.SpriteLiquid, undoName);
+    }
+
+    private void MarkChildLiquidObjectsDirty()
+    {
+        if (spheresManager == null)
+        {
+            return;
+        }
+
+        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
+        for (int i = 0; i < childSpheres.Length; i++)
+        {
+            GlassSphere2D sphere = childSpheres[i];
+            if (sphere == null)
+            {
+                continue;
+            }
+
+            MarkDirty(sphere);
+            MarkDirty(sphere.SpriteLiquid);
         }
     }
 

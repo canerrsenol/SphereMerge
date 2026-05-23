@@ -58,6 +58,17 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         }
     }
 
+    public void SetLiquidColors(Color newLiquidColor, Color newGlowColor)
+    {
+        liquidColor = newLiquidColor;
+        glowColor = newGlowColor;
+
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
+
+        ApplyProperties();
+    }
+
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();

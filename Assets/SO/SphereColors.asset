@@ -12,9 +12,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5a2113d1b1c8f147bcb2d499132c931, type: 3}
   m_Name: SphereColors
   m_EditorClassIdentifier: Assembly-CSharp::SphereColorsSO
-  _colors:
-  - {r: 0.106308244, g: 0.15295655, b: 0.89433956, a: 1}
-  - {r: 0.7863952, g: 0.90943396, b: 0.1012388, a: 1}
-  - {r: 0.7728982, g: 0.082352936, b: 0.9490196, a: 1}
-  - {r: 0.93207544, g: 0.08969026, b: 0.7081743, a: 1}
-  - {r: 0.381132, g: 0.24219337, b: 0.082698405, a: 1}
+  colors:
+  - sphereColor: 0
+    liquidColor: {r: 0.106308244, g: 0.15295655, b: 0.89433956, a: 0.87}
+    glowColor: {r: 0.106308244, g: 0.15295655, b: 0.89433956, a: 1}
+  - sphereColor: 1
+    liquidColor: {r: 0.7863952, g: 0.90943396, b: 0.1012388, a: 0.87}
+    glowColor: {r: 0.7863952, g: 0.90943396, b: 0.1012388, a: 1}
+  - sphereColor: 2
+    liquidColor: {r: 0.7728982, g: 0.082352936, b: 0.9490196, a: 0.87}
+    glowColor: {r: 0.7728982, g: 0.082352936, b: 0.9490196, a: 1}
+  - sphereColor: 3
+    liquidColor: {r: 0.93207544, g: 0.08969026, b: 0.7081743, a: 0.87}
+    glowColor: {r: 0.93207544, g: 0.08969026, b: 0.7081743, a: 1}
+  - sphereColor: 4
+    liquidColor: {r: 0.381132, g: 0.24219337, b: 0.082698405, a: 0.87}
+    glowColor: {r: 0.381132, g: 0.24219337, b: 0.082698405, a: 1}

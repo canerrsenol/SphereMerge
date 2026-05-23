@@ -13,6 +13,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
     private const Ease DefaultIntroEase = Ease.OutBack;
 
     [SerializeField] private GlassSphere2D spherePrefab;
+    [SerializeField] private SphereColorsSO sphereColors;
     [SerializeField, HideInInspector] private Vector2Int gridSize;
     [FormerlySerializedAs("spacing")]
     [SerializeField, HideInInspector] private Vector2 tileOffset = Vector2.one;
@@ -23,12 +24,14 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
     private Sequence introSequence;
 
     public GlassSphere2D SpherePrefab => spherePrefab;
+    public SphereColorsSO SphereColors => sphereColors;
     public Vector2Int GridSize => gridSize;
     public Vector2 TileOffset => tileOffset;
     public bool IsGridSizeValid => gridSize.x > 0 && gridSize.y > 0;
 
     private void Start()
     {
+        ApplySphereColorPalettes();
         PlayIntroAnimation();
     }
 
@@ -47,6 +50,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         NormalizeGridSettings();
         EnsureGridDataSize();
         ApplySpherePositions();
+        ApplySphereColorPalettes();
     }
 
     public void SetGridSettings(Vector2Int newGridSize, Vector2 newTileOffset, bool alignTransform, float topLocalY)
@@ -110,6 +114,17 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         {
             sphere.transform.SetParent(transform, true);
         }
+
+        if (sphere != null)
+        {
+            sphere.SetColorPalette(sphereColors);
+        }
+    }
+
+    public void SetSphereColors(SphereColorsSO newSphereColors)
+    {
+        sphereColors = newSphereColors;
+        ApplySphereColorPalettes();
     }
 
     public void ClearGridData()
@@ -250,6 +265,31 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
                 {
                     sphereTransform.localPosition = GetLocalPosition(new Vector2Int(x, y));
                 }
+            }
+        }
+    }
+
+    private void ApplySphereColorPalettes()
+    {
+        if (!IsGridSizeValid || spheres == null)
+        {
+            return;
+        }
+
+        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
+        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GlassSphere2D sphere = spheres[x, y];
+                if (sphere == null)
+                {
+                    continue;
+                }
+
+                sphere.SetColorPalette(sphereColors);
             }
         }
     }
