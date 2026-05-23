@@ -1,7 +1,6 @@
 using UnityEngine;
 
 [DisallowMultipleComponent]
-[RequireComponent(typeof(SpriteRenderer))]
 public sealed class SpriteLiquid2D : MonoBehaviour
 {
     static readonly int FillAmountId = Shader.PropertyToID("_FillAmount");
@@ -14,6 +13,9 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     static readonly int WaveAmountId = Shader.PropertyToID("_WaveAmount");
     static readonly int LiquidRadiusId = Shader.PropertyToID("_LiquidRadius");
     static readonly int EdgeSoftnessId = Shader.PropertyToID("_EdgeSoftness");
+
+    [Header("Renderer")]
+    [SerializeField] SpriteRenderer targetRenderer;
 
     [Header("Liquid")]
     [Range(0f, 1f)] [SerializeField] float fillAmount = 0.5f;
@@ -40,7 +42,6 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     [SerializeField] float maxSlosh = 0.55f;
     [SerializeField] float maxLiquidOffset = 0.09f;
 
-    SpriteRenderer spriteRenderer;
     MaterialPropertyBlock propertyBlock;
     Vector2 previousVelocity;
     Vector2 liquidOffset;
@@ -63,15 +64,14 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         liquidColor = newLiquidColor;
         glowColor = newGlowColor;
 
-        if (spriteRenderer == null)
-            spriteRenderer = GetComponent<SpriteRenderer>();
+        CacheRenderer();
 
         ApplyProperties();
     }
 
     void Awake()
     {
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        CacheRenderer();
         propertyBlock = new MaterialPropertyBlock();
 
         if (targetRigidbody == null)
@@ -133,19 +133,50 @@ public sealed class SpriteLiquid2D : MonoBehaviour
 
         if (Application.isPlaying == false)
         {
-            spriteRenderer = GetComponent<SpriteRenderer>();
+            CacheRenderer();
             propertyBlock ??= new MaterialPropertyBlock();
             ApplyProperties();
         }
     }
 
+    void CacheRenderer()
+    {
+        if (targetRenderer != null)
+            return;
+
+        SpriteRenderer[] renderers = GetComponentsInChildren<SpriteRenderer>(true);
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            SpriteRenderer renderer = renderers[i];
+            if (renderer != null && renderer.transform != transform && renderer.enabled)
+            {
+                targetRenderer = renderer;
+                return;
+            }
+        }
+
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            SpriteRenderer renderer = renderers[i];
+            if (renderer != null && renderer.transform != transform)
+            {
+                targetRenderer = renderer;
+                return;
+            }
+        }
+
+        targetRenderer = GetComponent<SpriteRenderer>();
+    }
+
     void ApplyProperties()
     {
-        if (spriteRenderer == null)
+        CacheRenderer();
+
+        if (targetRenderer == null)
             return;
 
         propertyBlock ??= new MaterialPropertyBlock();
-        spriteRenderer.GetPropertyBlock(propertyBlock);
+        targetRenderer.GetPropertyBlock(propertyBlock);
 
         Vector2 worldUpInLocal = transform.InverseTransformDirection(Vector2.up);
         Vector2 liquidUp = (worldUpInLocal + new Vector2(slosh, 0f)).normalized;
@@ -160,6 +191,6 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         propertyBlock.SetVector(LiquidUpId, new Vector4(liquidUp.x, liquidUp.y, 0f, 0f));
         propertyBlock.SetVector(LiquidOffsetId, new Vector4(liquidOffset.x, liquidOffset.y, 0f, 0f));
         propertyBlock.SetFloat(SloshId, slosh);
-        spriteRenderer.SetPropertyBlock(propertyBlock);
+        targetRenderer.SetPropertyBlock(propertyBlock);
     }
 }
