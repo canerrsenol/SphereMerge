@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -41,6 +42,9 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
             EditorGUILayout.HelpBox("Select a SpheresManager to edit.", MessageType.Info);
             return;
         }
+
+        DrawGridSettings();
+        EditorGUILayout.Space(8f);
 
         if (!spheresManager.IsGridSizeValid)
         {
@@ -98,6 +102,137 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+    }
+
+    private void DrawGridSettings()
+    {
+        EditorGUILayout.LabelField("Grid Settings", EditorStyles.boldLabel);
+
+        EditorGUI.BeginChangeCheck();
+        Vector2Int gridSize = EditorGUILayout.Vector2IntField("Grid Size", spheresManager.GridSize);
+        Vector2 tileOffset = EditorGUILayout.Vector2Field("Tile Offset", spheresManager.TileOffset);
+
+        if (!EditorGUI.EndChangeCheck())
+        {
+            return;
+        }
+
+        bool shouldCenterTransform = gridSize != spheresManager.GridSize || tileOffset != spheresManager.TileOffset;
+        bool gridSizeChanged = gridSize != spheresManager.GridSize;
+        float topLocalY = spheresManager.GetGridTopLocalY();
+        List<GlassSphere2D> spheresOutsideNewGrid = gridSizeChanged ? GetSpheresOutsideGrid(gridSize) : null;
+
+        Undo.RecordObject(spheresManager, "Change Sphere Grid Settings");
+        Undo.RecordObject(spheresManager.transform, "Change Sphere Grid Settings");
+
+        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
+        for (int i = 0; i < childSpheres.Length; i++)
+        {
+            GlassSphere2D sphere = childSpheres[i];
+            if (sphere != null && sphere.transform.IsChildOf(spheresManager.transform))
+            {
+                Undo.RecordObject(sphere.transform, "Change Sphere Grid Settings");
+            }
+        }
+
+        spheresManager.SetGridSettings(gridSize, tileOffset, shouldCenterTransform, topLocalY);
+        DestroySpheres(spheresOutsideNewGrid);
+
+        if (gridSizeChanged)
+        {
+            FillEmptyGridCells();
+        }
+
+        MarkDirty(spheresManager);
+        MarkDirty(spheresManager.transform);
+        for (int i = 0; i < childSpheres.Length; i++)
+        {
+            GlassSphere2D sphere = childSpheres[i];
+            if (sphere != null && sphere.transform.IsChildOf(spheresManager.transform))
+            {
+                MarkDirty(sphere.transform);
+            }
+        }
+
+        Repaint();
+    }
+
+    private List<GlassSphere2D> GetSpheresOutsideGrid(Vector2Int newGridSize)
+    {
+        List<GlassSphere2D> spheresOutsideGrid = new List<GlassSphere2D>();
+        Vector2Int currentGridSize = spheresManager.GridSize;
+
+        for (int x = 0; x < currentGridSize.x; x++)
+        {
+            for (int y = 0; y < currentGridSize.y; y++)
+            {
+                if (x < newGridSize.x && y < newGridSize.y)
+                {
+                    continue;
+                }
+
+                GlassSphere2D sphere = spheresManager.GetSphere(new Vector2Int(x, y));
+                if (sphere != null && !spheresOutsideGrid.Contains(sphere))
+                {
+                    spheresOutsideGrid.Add(sphere);
+                }
+            }
+        }
+
+        return spheresOutsideGrid;
+    }
+
+    private void DestroySpheres(List<GlassSphere2D> spheresToDestroy)
+    {
+        if (spheresToDestroy == null)
+        {
+            return;
+        }
+
+        for (int i = 0; i < spheresToDestroy.Count; i++)
+        {
+            GlassSphere2D sphere = spheresToDestroy[i];
+            if (sphere != null)
+            {
+                Undo.DestroyObjectImmediate(sphere.gameObject);
+            }
+        }
+    }
+
+    private void FillEmptyGridCells()
+    {
+        if (spheresManager == null || !spheresManager.IsGridSizeValid || spheresManager.SpherePrefab == null)
+        {
+            return;
+        }
+
+        CacheColorOptions();
+        SphereColors defaultColor = colorOptions != null && colorOptions.Length > 0 ? colorOptions[0] : SphereColors.Blue;
+        Vector2Int gridSize = spheresManager.GridSize;
+
+        for (int x = 0; x < gridSize.x; x++)
+        {
+            for (int y = 0; y < gridSize.y; y++)
+            {
+                Vector2Int position = new Vector2Int(x, y);
+                if (spheresManager.GetSphere(position) != null)
+                {
+                    continue;
+                }
+
+                GlassSphere2D sphere = CreateSphere(position);
+                if (sphere == null)
+                {
+                    continue;
+                }
+
+                sphere.SetSphereColor(defaultColor);
+                spheresManager.SetSphere(position, sphere);
+                MarkDirty(sphere.gameObject);
+                MarkDirty(sphere.transform);
+                MarkDirty(sphere);
+            }
+        }
     }
 
     private void DrawGridControls()

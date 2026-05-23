@@ -5,8 +5,6 @@ public class GameSceneLifetimeScope : LifetimeScope
 {
     protected override void Configure(IContainerBuilder builder)
     {
-        builder.RegisterInstance(this).As<LifetimeScope>();
-
         builder.RegisterComponentInHierarchy<GameManager>()
             .As<IGameStateService>();
 

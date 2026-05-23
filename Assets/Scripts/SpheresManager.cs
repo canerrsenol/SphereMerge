@@ -8,9 +8,9 @@ using UnityEngine.Serialization;
 public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerService
 {
     [SerializeField] private GlassSphere2D spherePrefab;
-    [SerializeField] private Vector2Int gridSize;
+    [SerializeField, UnityEngine.HideInInspector] private Vector2Int gridSize;
     [FormerlySerializedAs("spacing")]
-    [SerializeField] private Vector2 tileOffset = Vector2.one;
+    [SerializeField, UnityEngine.HideInInspector] private Vector2 tileOffset = Vector2.one;
     [SerializeField, UnityEngine.HideInInspector] private Vector2Int storedGridSize;
     [OdinSerialize, UnityEngine.HideInInspector] private GlassSphere2D[,] spheres = new GlassSphere2D[0, 0];
 
@@ -22,18 +22,52 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
 
     private void OnValidate()
     {
-        if (gridSize.x < 0 || gridSize.y < 0)
-        {
-            gridSize = new Vector2Int(Mathf.Max(0, gridSize.x), Mathf.Max(0, gridSize.y));
-        }
-
-        if (tileOffset.y < 0f)
-        {
-            tileOffset.y = -tileOffset.y;
-        }
-
+        NormalizeGridSettings();
         EnsureGridDataSize();
         ApplySpherePositions();
+    }
+
+    public void SetGridSettings(Vector2Int newGridSize, Vector2 newTileOffset, bool alignTransform, float topLocalY)
+    {
+        gridSize = newGridSize;
+        tileOffset = newTileOffset;
+
+        NormalizeGridSettings();
+        EnsureGridDataSize();
+        ApplySpherePositions();
+
+        if (alignTransform)
+        {
+            AlignTransformToGrid(topLocalY);
+        }
+    }
+
+    public void CenterTransformToGrid()
+    {
+        AlignTransformToGrid(GetGridTopLocalY());
+    }
+
+    public float GetGridTopLocalY()
+    {
+        if (!IsGridSizeValid)
+        {
+            return transform.localPosition.y;
+        }
+
+        return transform.localPosition.y + GetGridEdgeOffset(gridSize.y, Mathf.Abs(tileOffset.y));
+    }
+
+    public void AlignTransformToGrid(float topLocalY)
+    {
+        if (!IsGridSizeValid)
+        {
+            return;
+        }
+
+        Vector3 localPosition = transform.localPosition;
+        localPosition.x = -GetGridCenterOffset(gridSize.x, tileOffset.x);
+        localPosition.y = topLocalY - GetGridEdgeOffset(gridSize.y, Mathf.Abs(tileOffset.y));
+        transform.localPosition = localPosition;
     }
 
     public GlassSphere2D GetSphere(Vector2Int position)
@@ -130,6 +164,29 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         ResizeSpheresPreservingPositions();
     }
 
+    private void NormalizeGridSettings()
+    {
+        if (gridSize.x < 0 || gridSize.y < 0)
+        {
+            gridSize = new Vector2Int(Mathf.Max(0, gridSize.x), Mathf.Max(0, gridSize.y));
+        }
+
+        if (tileOffset.y < 0f)
+        {
+            tileOffset.y = -tileOffset.y;
+        }
+    }
+
+    private static float GetGridCenterOffset(int cellCount, float tileOffset)
+    {
+        return GetGridEdgeOffset(cellCount, tileOffset) * 0.5f;
+    }
+
+    private static float GetGridEdgeOffset(int cellCount, float tileOffset)
+    {
+        return Mathf.Max(0, cellCount - 1) * tileOffset;
+    }
+
     private bool TryGetArrayPosition(Vector2Int position, out int x, out int y)
     {
         EnsureGridDataSize();
@@ -203,7 +260,6 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
     }
 
     [Button("Edit Level")]
-    [ShowIf(nameof(IsGridSizeValid))]
     private void OpenLevelEditor()
     {
 #if UNITY_EDITOR
