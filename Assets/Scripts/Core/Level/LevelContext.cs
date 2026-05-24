@@ -17,7 +17,6 @@ public class LevelContext : MonoBehaviour
 
         builder.RegisterComponent(this).AsSelf().AsImplementedInterfaces();
         builder.RegisterComponent(spheresManager)
-            .As<ISpheresManagerService>()
             .AsSelf();
         builder.RegisterComponent(spheresMergeManager)
             .As<ISpheresMergeManagerService>()

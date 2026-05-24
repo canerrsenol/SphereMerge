@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using PrimeTween;
 using Sirenix.OdinInspector;
@@ -6,7 +7,7 @@ using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerService
+public sealed class SpheresManager : SerializedMonoBehaviour
 {
     private const float DefaultIntroDuration = 0.25f;
     private const float DefaultIntroStagger = 0.03f;
@@ -25,9 +26,20 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
 
     public GlassSphere2D SpherePrefab => spherePrefab;
     public SphereColorsSO SphereColors => sphereColors;
+    public IReadOnlyList<ObstacleBaseAbstract> Obstacles => obstacles;
     public Vector2Int GridSize => gridSize;
     public Vector2 TileOffset => tileOffset;
     public bool IsGridSizeValid => gridSize.x > 0 && gridSize.y > 0;
+
+    private void OnEnable()
+    {
+        EventBus.Subscribe<SphereSelectedEvent>(HandleSphereSelected);
+    }
+
+    private void OnDisable()
+    {
+        EventBus.Unsubscribe<SphereSelectedEvent>(HandleSphereSelected);
+    }
 
     private void Start()
     {
@@ -53,8 +65,9 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         ApplySphereColorPalettes();
     }
 
-    public void ReportSphereSelected(GlassSphere2D sphere)
+    private void HandleSphereSelected(SphereSelectedEvent selectionEvent)
     {
+        GlassSphere2D sphere = selectionEvent.SelectedSphere;
         if (sphere == null || !TryFindSpherePosition(sphere, out Vector2Int position))
         {
             return;

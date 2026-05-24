@@ -6,12 +6,21 @@ using UnityEngine;
 
 public sealed class SpheresManagerEditorWindow : EditorWindow
 {
+    private enum ObstaclePaintMode
+    {
+        Keep,
+        Set,
+        Clear
+    }
+
     private const float CellSize = 56f;
     private const float CellSpacing = 4f;
     private const string WindowTitle = "Sphere Grid Editor";
 
     private SpheresManager spheresManager;
     private SphereColors selectedColor;
+    private ObstacleBaseAbstract selectedObstaclePrefab;
+    private ObstaclePaintMode obstaclePaintMode = ObstaclePaintMode.Keep;
     private SphereColors[] colorOptions;
     private Vector2 scrollPosition;
     private GUIStyle centeredCellLabel;
@@ -61,6 +70,8 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         spheresManager.EnsureGridDataSize();
 
         DrawColorPalette();
+        EditorGUILayout.Space(6f);
+        DrawObstaclePalette();
         EditorGUILayout.Space(8f);
         DrawGridControls();
         EditorGUILayout.Space(8f);
@@ -103,6 +114,61 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndHorizontal();
+    }
+
+    private void DrawObstaclePalette()
+    {
+        EditorGUILayout.LabelField("Obstacles", EditorStyles.boldLabel);
+        EditorGUILayout.BeginHorizontal();
+
+        DrawObstacleModeButton("Keep", obstaclePaintMode == ObstaclePaintMode.Keep, () =>
+        {
+            obstaclePaintMode = ObstaclePaintMode.Keep;
+            selectedObstaclePrefab = null;
+        });
+
+        DrawObstacleModeButton("Clear", obstaclePaintMode == ObstaclePaintMode.Clear, () =>
+        {
+            obstaclePaintMode = ObstaclePaintMode.Clear;
+            selectedObstaclePrefab = null;
+        });
+
+        IReadOnlyList<ObstacleBaseAbstract> obstaclePrefabs = spheresManager.Obstacles;
+        if (obstaclePrefabs != null)
+        {
+            for (int i = 0; i < obstaclePrefabs.Count; i++)
+            {
+                ObstacleBaseAbstract obstaclePrefab = obstaclePrefabs[i];
+                if (obstaclePrefab == null)
+                {
+                    continue;
+                }
+
+                bool isSelected = obstaclePaintMode == ObstaclePaintMode.Set
+                    && selectedObstaclePrefab == obstaclePrefab;
+
+                DrawObstacleModeButton(GetObstacleLabel(obstaclePrefab), isSelected, () =>
+                {
+                    obstaclePaintMode = ObstaclePaintMode.Set;
+                    selectedObstaclePrefab = obstaclePrefab;
+                });
+            }
+        }
+
+        EditorGUILayout.EndHorizontal();
+    }
+
+    private static void DrawObstacleModeButton(string label, bool isSelected, Action onClick)
+    {
+        Color previousColor = GUI.backgroundColor;
+        GUI.backgroundColor = isSelected ? new Color(0.55f, 0.75f, 1f, 1f) : previousColor;
+
+        if (GUILayout.Button(label, GUILayout.Height(24f)))
+        {
+            onClick?.Invoke();
+        }
+
+        GUI.backgroundColor = previousColor;
     }
 
     private void DrawGridSettings()
@@ -307,11 +373,12 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
     {
         GlassSphere2D sphere = spheresManager.GetSphere(position);
         Color backgroundColor = sphere != null ? GetEditorColor(sphere.SphereColor) : new Color(0.18f, 0.18f, 0.18f, 1f);
+        ObstacleBaseAbstract obstacle = sphere != null ? GetSphereObstacle(sphere) : null;
 
         EditorGUI.DrawRect(rect, backgroundColor);
         DrawRectOutline(rect, sphere != null ? Color.white : new Color(0.45f, 0.45f, 0.45f, 1f), 1f);
 
-        string label = sphere != null ? sphere.SphereColor.ToString() : $"{position.x},{position.y}";
+        string label = sphere != null ? GetCellLabel(sphere, obstacle) : $"{position.x},{position.y}";
         GUI.Label(rect, label, sphere != null ? centeredCellLabel : centeredSmallLabel);
 
         if (GUI.Button(rect, GUIContent.none, GUIStyle.none))
@@ -334,12 +401,13 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
 
         GlassSphere2D sphere = spheresManager.GetSphere(position);
-        string undoName = sphere == null ? "Place Sphere" : "Update Sphere Cell";
+        bool isNewSphere = sphere == null;
+        string undoName = isNewSphere ? "Place Sphere" : "Update Sphere Cell";
 
         Undo.RecordObject(spheresManager, undoName);
         spheresManager.EnsureGridDataSize();
 
-        if (sphere == null)
+        if (isNewSphere)
         {
             sphere = CreateSphere(position);
             if (sphere == null)
@@ -357,7 +425,12 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
 
         spheresManager.SetSphere(position, sphere);
-        sphere.SetSphereColor(selectedColor);
+        if (isNewSphere || obstaclePaintMode == ObstaclePaintMode.Keep)
+        {
+            sphere.SetSphereColor(selectedColor);
+        }
+
+        ApplySelectedObstaclePaint(sphere, undoName);
 
         MarkDirty(spheresManager);
         MarkDirty(sphere.gameObject);
@@ -365,6 +438,91 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         MarkDirty(sphere);
         MarkDirty(sphere.SpriteLiquid);
         Repaint();
+    }
+
+    private void ApplySelectedObstaclePaint(GlassSphere2D sphere, string undoName)
+    {
+        if (sphere == null)
+        {
+            return;
+        }
+
+        switch (obstaclePaintMode)
+        {
+            case ObstaclePaintMode.Keep:
+                return;
+
+            case ObstaclePaintMode.Clear:
+                ClearSphereObstacles(sphere);
+                return;
+
+            case ObstaclePaintMode.Set:
+                if (selectedObstaclePrefab != null)
+                {
+                    SetSphereObstacle(sphere, selectedObstaclePrefab, undoName);
+                }
+
+                return;
+        }
+    }
+
+    private void SetSphereObstacle(GlassSphere2D sphere, ObstacleBaseAbstract obstaclePrefab, string undoName)
+    {
+        ClearSphereObstacles(sphere);
+
+        GameObject prefabObject = obstaclePrefab.gameObject;
+        GameObject instanceObject = PrefabUtility.InstantiatePrefab(prefabObject, sphere.transform) as GameObject;
+
+        if (instanceObject == null)
+        {
+            instanceObject = UnityEngine.Object.Instantiate(prefabObject, sphere.transform);
+        }
+
+        Undo.RegisterCreatedObjectUndo(instanceObject, undoName);
+        instanceObject.name = prefabObject.name;
+
+        Transform instanceTransform = instanceObject.transform;
+        Undo.RecordObject(instanceTransform, undoName);
+        instanceTransform.localPosition = Vector3.zero;
+        instanceTransform.localRotation = Quaternion.identity;
+
+        MarkDirty(instanceObject);
+        MarkDirty(instanceTransform);
+        MarkDirty(instanceObject.GetComponent<ObstacleBaseAbstract>());
+    }
+
+    private static void ClearSphereObstacles(GlassSphere2D sphere)
+    {
+        if (sphere == null)
+        {
+            return;
+        }
+
+        ObstacleBaseAbstract[] obstacles = sphere.GetComponentsInChildren<ObstacleBaseAbstract>(true);
+        HashSet<GameObject> rootObjects = new HashSet<GameObject>();
+
+        for (int i = 0; i < obstacles.Length; i++)
+        {
+            ObstacleBaseAbstract obstacle = obstacles[i];
+            if (obstacle == null || obstacle.transform == sphere.transform)
+            {
+                continue;
+            }
+
+            GameObject rootObject = GetObstacleRootObject(sphere.transform, obstacle.transform);
+            if (rootObject != null)
+            {
+                rootObjects.Add(rootObject);
+            }
+        }
+
+        foreach (GameObject rootObject in rootObjects)
+        {
+            if (rootObject != null)
+            {
+                Undo.DestroyObjectImmediate(rootObject);
+            }
+        }
     }
 
     private GlassSphere2D CreateSphere(Vector2Int position)
@@ -406,6 +564,63 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         sphere.name = $"Sphere_{position.x}_{position.y}";
         sphere.transform.localPosition = spheresManager.GetLocalPosition(position);
         sphere.SetColorPalette(spheresManager.SphereColors);
+    }
+
+    private static ObstacleBaseAbstract GetSphereObstacle(GlassSphere2D sphere)
+    {
+        if (sphere == null)
+        {
+            return null;
+        }
+
+        ObstacleBaseAbstract[] obstacles = sphere.GetComponentsInChildren<ObstacleBaseAbstract>(true);
+        for (int i = 0; i < obstacles.Length; i++)
+        {
+            ObstacleBaseAbstract obstacle = obstacles[i];
+            if (obstacle != null && obstacle.transform != sphere.transform)
+            {
+                return obstacle;
+            }
+        }
+
+        return null;
+    }
+
+    private static GameObject GetObstacleRootObject(Transform sphereTransform, Transform obstacleTransform)
+    {
+        if (sphereTransform == null || obstacleTransform == null)
+        {
+            return null;
+        }
+
+        Transform root = obstacleTransform;
+        while (root.parent != null && root.parent != sphereTransform)
+        {
+            root = root.parent;
+        }
+
+        return root.parent == sphereTransform ? root.gameObject : obstacleTransform.gameObject;
+    }
+
+    private static string GetCellLabel(GlassSphere2D sphere, ObstacleBaseAbstract obstacle)
+    {
+        if (obstacle == null)
+        {
+            return sphere.SphereColor.ToString();
+        }
+
+        return $"{sphere.SphereColor}\n{GetObstacleLabel(obstacle)}";
+    }
+
+    private static string GetObstacleLabel(ObstacleBaseAbstract obstacle)
+    {
+        if (obstacle == null)
+        {
+            return string.Empty;
+        }
+
+        string obstacleName = obstacle.gameObject.name.Replace("(Clone)", string.Empty).Trim();
+        return ObjectNames.NicifyVariableName(obstacleName);
     }
 
     private void ClearGrid()

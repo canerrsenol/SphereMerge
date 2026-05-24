@@ -1,7 +1,6 @@
 using UnityEngine;
-using VContainer;
 
-public enum SphereState {Idle, IdleFirstInColumn, Selected, Merged}
+public enum SphereState { Idle, IdleFirstInColumn, Selected, Merged }
 
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class GlassSphere2D : MonoBehaviour, ISelectable
@@ -13,7 +12,6 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     [SerializeField] private GlassSphereVisual2D sphereVisual;
 
     private Rigidbody2D _rigidbody2D;
-    private ISpheresManagerService spheresManagerService;
     private SphereState currentState = SphereState.Idle;
     private bool canSelect = false;
     private Collider2D[] colliders;
@@ -48,12 +46,6 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplySphereColor();
     }
 
-    [Inject]
-    public void Construct(ISpheresManagerService spheresManagerService)
-    {
-        this.spheresManagerService = spheresManagerService;
-    }
-
     private void Update()
     {
         bool shouldShowOutline = currentState == SphereState.Selected
@@ -66,6 +58,16 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 
     public void OnSelect()
     {
+        // Check if any click obstacles prevent selection
+        var clickObstacles = GetComponentsInChildren<IClickManipulatorObstacle>();
+        foreach (var obstacle in clickObstacles)
+        {
+            if (!obstacle.CanClick)
+            {
+                return;
+            }
+        }
+
         if (!canSelect || currentState != SphereState.IdleFirstInColumn)
         {
             if (currentState == SphereState.Idle)
@@ -76,19 +78,8 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
             return;
         }
 
-        // Check if any click obstacles prevent selection
-        var clickObstacles = GetComponentsInChildren<IClickManipulatorObstacle>();
-        foreach (var obstacle in clickObstacles)
-        {
-            if (!obstacle.CanClick)
-            {
-                sphereVisual?.PlayCannotSelectAnimation();
-                return;
-            }
-        }
-
         SetSphereState(SphereState.Selected);
-        spheresManagerService?.ReportSphereSelected(this);
+        EventBus.Publish(new SphereSelectedEvent(this));
     }
 
     public void SetSphereState(SphereState newState)
@@ -167,7 +158,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
                 SetContactSensorEnabled(false);
                 SetOutlineVisible(false, forceOutline);
                 break;
-            
+
             case SphereState.IdleFirstInColumn:
                 canSelect = true;
                 SetRigidbodyActive(true);
