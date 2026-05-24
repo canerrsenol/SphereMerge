@@ -11,6 +11,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
     [Header("Animation")]
     [Min(0.01f)][SerializeField] private float mergeDuration = 0.18f;
     [SerializeField] private Ease mergeEase = Ease.InBack;
+    [SerializeField] private Ease mergeScaleEase = Ease.OutSine;
 
     private readonly List<SphereContact> contacts = new List<SphereContact>();
     private readonly List<GlassSphere2D> mergeCandidates = new List<GlassSphere2D>(MergeCount);
@@ -117,7 +118,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
             Transform sphereTransform = sphere.transform;
             sequence.Group(Tween.PositionX(sphereTransform, mergePosition.x, mergeDuration, mergeEase));
             sequence.Group(Tween.PositionY(sphereTransform, mergePosition.y, mergeDuration, mergeEase));
-            sequence.Group(Tween.Scale(sphereTransform, Vector3.one * .35f, mergeDuration, mergeEase));
+            sequence.Group(Tween.Scale(sphereTransform, Vector3.zero, mergeDuration, mergeScaleEase));
         }
 
         sequence.ChainCallback(() => DestroyMergedSpheres(group));

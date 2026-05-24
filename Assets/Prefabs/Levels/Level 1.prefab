@@ -241,7 +241,8 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-  obstacles: []
+  obstacles:
+  - {fileID: 8651074504279178972, guid: f31ec9e8327cec74aa731ed589401981, type: 3}
   spherePrefab: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
   sphereColors: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
   gridSize: {x: 6, y: 4}
@@ -292,8 +293,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9a1b13c080da49ad8c89026f3f5a4dd8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpheresMergeManager
-  mergeDuration: 0.18
-  mergeEase: 2
+  mergeDuration: 0.2
+  mergeEase: 3
+  mergeScaleEase: 2
 --- !u!1 &3156527358811790947
 GameObject:
   m_ObjectHideFlags: 0
