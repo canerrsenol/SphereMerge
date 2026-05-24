@@ -17,6 +17,9 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     static readonly int LiquidColorId = Shader.PropertyToID("_LiquidColor");
     static readonly int GlowColorId = Shader.PropertyToID("_GlowColor");
     static readonly int GlowIntensityId = Shader.PropertyToID("_GlowIntensity");
+    static readonly int OutlineEnabledId = Shader.PropertyToID("_OutlineEnabled");
+    static readonly int OutlineWidthId = Shader.PropertyToID("_OutlineWidth");
+    static readonly int OutlineColorId = Shader.PropertyToID("_OutlineColor");
     static readonly int LiquidUpId = Shader.PropertyToID("_LiquidUp");
     static readonly int LiquidOffsetId = Shader.PropertyToID("_LiquidOffset");
 
@@ -30,6 +33,9 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     [SerializeField] Color liquidColor = new Color(0.08f, 0.55f, 1f, 0.82f);
     [SerializeField] Color glowColor = new Color(0.25f, 0.9f, 1f, 1f);
     [Range(0f, 4f)] [SerializeField] float glowIntensity = 1f;
+    [SerializeField] bool outlineEnabled = true;
+    [Range(0f, 16f)] [SerializeField] float outlineWidth = 4f;
+    [SerializeField] Color outlineColor = new Color(0.03f, 0.22f, 0.55f, 1f);
 
     MaterialPropertyBlock propertyBlock;
     Vector2 previousVelocity;
@@ -50,11 +56,35 @@ public sealed class SpriteLiquid2D : MonoBehaviour
 
     public void SetLiquidColors(Color newLiquidColor, Color newGlowColor)
     {
+        SetLiquidColors(newLiquidColor, newGlowColor, outlineColor);
+    }
+
+    public void SetLiquidColors(Color newLiquidColor, Color newGlowColor, Color newOutlineColor)
+    {
         liquidColor = newLiquidColor;
         glowColor = newGlowColor;
+        outlineColor = newOutlineColor;
 
         CacheRenderer();
 
+        ApplyProperties();
+    }
+
+    public void SetOutlineEnabled(bool enabled)
+    {
+        outlineEnabled = enabled;
+        ApplyProperties();
+    }
+
+    public void SetOutlineWidth(float width)
+    {
+        outlineWidth = Mathf.Max(0f, width);
+        ApplyProperties();
+    }
+
+    public void SetOutlineColor(Color color)
+    {
+        outlineColor = color;
         ApplyProperties();
     }
 
@@ -125,6 +155,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
     {
         fillAmount = Mathf.Clamp01(fillAmount);
         glowIntensity = Mathf.Max(0f, glowIntensity);
+        outlineWidth = Mathf.Max(0f, outlineWidth);
 
         if (Application.isPlaying == false)
         {
@@ -180,6 +211,9 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         propertyBlock.SetColor(LiquidColorId, liquidColor);
         propertyBlock.SetColor(GlowColorId, glowColor);
         propertyBlock.SetFloat(GlowIntensityId, glowIntensity);
+        propertyBlock.SetFloat(OutlineEnabledId, outlineEnabled ? 1f : 0f);
+        propertyBlock.SetFloat(OutlineWidthId, outlineWidth);
+        propertyBlock.SetColor(OutlineColorId, outlineColor);
         propertyBlock.SetVector(LiquidUpId, new Vector4(liquidUp.x, liquidUp.y, 0f, 0f));
         propertyBlock.SetVector(LiquidOffsetId, new Vector4(liquidOffset.x, liquidOffset.y, 0f, 0f));
         targetRenderer.SetPropertyBlock(propertyBlock);

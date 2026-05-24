@@ -44,4 +44,9 @@ public class RopeSegment2D : MonoBehaviour
 
         _joint.enableCollision = false;
     }
+
+    public void DisconnectFromPrevious()
+    {
+        _joint.enabled = false;
+    }
 }

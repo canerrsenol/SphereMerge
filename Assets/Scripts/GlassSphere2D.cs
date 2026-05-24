@@ -78,12 +78,13 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 
         Color liquidColor = SphereColorsSO.GetDefaultLiquidColor(sphereColor);
         Color glowColor = SphereColorsSO.GetDefaultGlowColor(sphereColor);
+        Color outlineColor = SphereColorsSO.GetDefaultOutlineColor(sphereColor);
 
         if (colorPalette != null)
         {
-            colorPalette.TryGetColors(sphereColor, out liquidColor, out glowColor);
+            colorPalette.TryGetColors(sphereColor, out liquidColor, out glowColor, out outlineColor);
         }
 
-        spriteLiquid.SetLiquidColors(liquidColor, glowColor);
+        spriteLiquid.SetLiquidColors(liquidColor, glowColor, outlineColor);
     }
 }
