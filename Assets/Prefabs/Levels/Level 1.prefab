@@ -839,8 +839,8 @@ MonoBehaviour:
   segmentPrefab: {fileID: 3651415340063810711, guid: 9c31f90802532af4d8edc6964602b509, type: 3}
   lineRenderer: {fileID: 3404751266668456025}
   rightLineRenderer: {fileID: 8616107815567706608}
-  sagAmount: 0.03
-  segmentRadius: 0.06
+  sagAmount: 0.31
+  segmentRadius: 0.04
   showEditorPreview: 1
   previewLineColor: {r: 0.2, g: 0.8, b: 1, a: 1}
   previewSegmentColor: {r: 1, g: 0.85, b: 0.2, a: 1}

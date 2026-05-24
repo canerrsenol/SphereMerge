@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using VContainer;
 
@@ -8,8 +9,20 @@ public sealed class SphereContactSensor2D : MonoBehaviour
     [SerializeField] private GlassSphere2D sphere;
 
     private ISpheresMergeManagerService mergeManagerService;
+    private readonly HashSet<GlassSphere2D> sameColorContacts = new HashSet<GlassSphere2D>();
+    private bool hasContactValue;
 
     public GlassSphere2D Sphere => sphere;
+    public bool hasContact
+    {
+        get
+        {
+            RefreshContactState();
+            return hasContactValue;
+        }
+    }
+
+    public bool HasContact => hasContact;
 
     [Inject]
     public void Construct(ISpheresMergeManagerService mergeManagerService)
@@ -42,6 +55,12 @@ public sealed class SphereContactSensor2D : MonoBehaviour
         ReportContact(collision, false);
     }
 
+    private void OnDisable()
+    {
+        sameColorContacts.Clear();
+        hasContactValue = false;
+    }
+
     private void ReportContact(Collision2D collision, bool isTouching)
     {
         CacheReferences();
@@ -57,6 +76,8 @@ public sealed class SphereContactSensor2D : MonoBehaviour
             return;
         }
 
+        UpdateContactState(otherSphere, isTouching);
+
         if (mergeManagerService == null)
         {
             return;
@@ -70,6 +91,26 @@ public sealed class SphereContactSensor2D : MonoBehaviour
         {
             mergeManagerService.ReportSphereContactEnded(sphere, otherSphere);
         }
+    }
+
+    private void UpdateContactState(GlassSphere2D otherSphere, bool isTouching)
+    {
+        if (isTouching && sphere.SphereColor == otherSphere.SphereColor)
+        {
+            sameColorContacts.Add(otherSphere);
+        }
+        else
+        {
+            sameColorContacts.Remove(otherSphere);
+        }
+
+        RefreshContactState();
+    }
+
+    private void RefreshContactState()
+    {
+        sameColorContacts.RemoveWhere(contact => contact == null);
+        hasContactValue = sameColorContacts.Count > 0;
     }
 
     private void CacheReferences()

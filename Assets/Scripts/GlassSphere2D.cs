@@ -10,6 +10,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 
     private Rigidbody2D _rigidbody2D;
     private bool canSelect = true;
+    private bool outlineVisible;
     private const float SelectedGravityScale = 1f;
 
     public bool CanSelect => canSelect;
@@ -20,7 +21,12 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         CacheReferences();
-        contactSensor.enabled = false;
+        if (contactSensor != null)
+        {
+            contactSensor.enabled = false;
+        }
+
+        SetOutlineVisible(false, true);
         ApplySphereColor();
     }
 
@@ -35,6 +41,16 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplySphereColor();
     }
 
+    private void Update()
+    {
+        bool shouldShowOutline = !canSelect
+            && contactSensor != null
+            && contactSensor.enabled
+            && contactSensor.hasContact;
+
+        SetOutlineVisible(shouldShowOutline);
+    }
+
     public void OnSelect()
     {
         if (!canSelect)
@@ -44,7 +60,10 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 
         canSelect = false;
         _rigidbody2D.gravityScale = SelectedGravityScale;
-        contactSensor.enabled = true;
+        if (contactSensor != null)
+        {
+            contactSensor.enabled = true;
+        }
     }
 
     public void SetSphereColor(SphereColors color)
@@ -93,5 +112,20 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         }
 
         spriteLiquid.SetLiquidColors(liquidColor, glowColor, outlineColor);
+    }
+
+    private void SetOutlineVisible(bool visible, bool force = false)
+    {
+        if (!force && outlineVisible == visible)
+        {
+            return;
+        }
+
+        outlineVisible = visible;
+
+        if (spriteLiquid != null)
+        {
+            spriteLiquid.SetOutlineEnabled(visible);
+        }
     }
 }

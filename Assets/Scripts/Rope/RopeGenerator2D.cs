@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RopeGenerator2D : MonoBehaviour
 {
+    private const float MinSegmentRadius = 0.001f;
+
     [Header("References")]
     [SerializeField] private Rigidbody2D leftAnchor;
     [SerializeField] private Rigidbody2D rightAnchor;
@@ -13,7 +15,7 @@ public class RopeGenerator2D : MonoBehaviour
 
     [Header("Rope Settings")]
     [SerializeField] private float sagAmount = 0.8f;
-    [Min(0.001f)]
+    [Min(MinSegmentRadius)]
     [SerializeField] private float segmentRadius = 0.08f;
 
     [Header("Editor Preview")]
@@ -60,7 +62,7 @@ public class RopeGenerator2D : MonoBehaviour
             segment.transform.localRotation = Quaternion.identity;
             segment.name = $"Rope Segment {i}";
 
-            segment.SetRadius(segmentRadius);
+            segment.SetRadius(GetSafeSegmentRadius());
             segment.Connect(previousBody, Vector2.Distance(previousPosition, position));
 
             _segments.Add(segment);
@@ -194,9 +196,22 @@ public class RopeGenerator2D : MonoBehaviour
 
     private int CalculateSegmentCount(Vector2 start, Vector2 end)
     {
-        float desiredSpacing = segmentRadius * 2f;
+        float desiredSpacing = GetSafeSegmentRadius() * 2f;
         float anchorDistance = Vector2.Distance(start, end);
         return Mathf.Max(1, Mathf.CeilToInt(anchorDistance / desiredSpacing) - 1);
+    }
+
+    private float GetSafeSegmentRadius()
+    {
+        if (segmentRadius < MinSegmentRadius || float.IsNaN(segmentRadius) || float.IsInfinity(segmentRadius))
+            return MinSegmentRadius;
+
+        return segmentRadius;
+    }
+
+    private void OnValidate()
+    {
+        segmentRadius = GetSafeSegmentRadius();
     }
 
     private Vector2 CalculateRopePoint(Vector2 start, Vector2 end, float t)
@@ -230,11 +245,13 @@ public class RopeGenerator2D : MonoBehaviour
         Gizmos.DrawLine(previousPoint, end);
 
         Gizmos.color = previewSegmentColor;
+        float safeSegmentRadius = GetSafeSegmentRadius();
+
         for (int i = 0; i < segmentCount; i++)
         {
             float t = (i + 1f) / (segmentCount + 1f);
             Vector2 point = CalculateRopePoint(start, end, t);
-            Gizmos.DrawWireSphere(point, segmentRadius);
+            Gizmos.DrawWireSphere(point, safeSegmentRadius);
         }
     }
 
