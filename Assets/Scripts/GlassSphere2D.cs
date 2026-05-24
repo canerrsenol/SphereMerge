@@ -3,14 +3,14 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 {
-    private const float SelectedGravityScale = 1f;
-
-    [SerializeField] private bool canSelect = true;
     [SerializeField] private SphereColors sphereColor;
     [SerializeField] private SphereColorsSO colorPalette;
     [SerializeField] private SpriteLiquid2D spriteLiquid;
+    [SerializeField] private SphereContactSensor2D contactSensor;
 
     private Rigidbody2D _rigidbody2D;
+    private bool canSelect = true;
+    private const float SelectedGravityScale = 1f;
 
     public bool CanSelect => canSelect;
     public SphereColors SphereColor => sphereColor;
@@ -20,6 +20,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         CacheReferences();
+        contactSensor.enabled = false;
         ApplySphereColor();
     }
 
@@ -43,6 +44,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 
         canSelect = false;
         _rigidbody2D.gravityScale = SelectedGravityScale;
+        contactSensor.enabled = true;
     }
 
     public void SetSphereColor(SphereColors color)
@@ -64,6 +66,11 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         if (spriteLiquid == null)
         {
             spriteLiquid = GetComponentInChildren<SpriteLiquid2D>();
+        }
+
+        if (contactSensor == null)
+        {
+            contactSensor = GetComponentInChildren<SphereContactSensor2D>(true);
         }
     }
 

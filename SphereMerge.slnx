@@ -2,10 +2,10 @@
   <Project Path="UniTask.csproj" />
   <Project Path="LeanCommon.csproj" />
   <Project Path="UniTask.Linq.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="UniTask.Addressables.csproj" />
   <Project Path="LeanTouch.csproj" />
   <Project Path="PrimeTween.Demo.csproj" />
-  <Project Path="Assembly-CSharp.csproj" />
   <Project Path="CW.Common.csproj" />
   <Project Path="UniTask.TextMeshPro.csproj" />
   <Project Path="UniTask.Editor.csproj" />

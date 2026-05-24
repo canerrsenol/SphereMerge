@@ -30,6 +30,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 4723625140319511914}
   - {fileID: 884787398076304319}
   - {fileID: 3116039662459964631}
   - {fileID: 5237918190730167890}
@@ -51,6 +52,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelContext
   spheresManager: {fileID: 1266844100242553200}
+  spheresMergeManager: {fileID: 8261291795213086353}
 --- !u!1 &1836783701519100093
 GameObject:
   m_ObjectHideFlags: 0
@@ -245,6 +247,52 @@ MonoBehaviour:
   tileOffset: {x: 0.45, y: 0.45}
   introAnimationSettings: {fileID: 11400000, guid: 16f659c5ceda36a4f9856dfb8bf08a76, type: 2}
   storedGridSize: {x: 6, y: 4}
+--- !u!1 &1902571525703069422
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4723625140319511914}
+  - component: {fileID: 8261291795213086353}
+  m_Layer: 0
+  m_Name: SpheresMergeManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4723625140319511914
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1902571525703069422}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.08089, y: 0, z: -0.06645}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8519595287479775528}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8261291795213086353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1902571525703069422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9a1b13c080da49ad8c89026f3f5a4dd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpheresMergeManager
+  mergeDuration: 0.18
+  mergeEase: 2
 --- !u!1 &3156527358811790947
 GameObject:
   m_ObjectHideFlags: 0
@@ -791,7 +839,7 @@ MonoBehaviour:
   segmentPrefab: {fileID: 3651415340063810711, guid: 9c31f90802532af4d8edc6964602b509, type: 3}
   lineRenderer: {fileID: 3404751266668456025}
   rightLineRenderer: {fileID: 8616107815567706608}
-  sagAmount: 0.07
+  sagAmount: 0.03
   segmentRadius: 0.06
   showEditorPreview: 1
   previewLineColor: {r: 0.2, g: 0.8, b: 1, a: 1}
@@ -1079,27 +1127,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1180,27 +1228,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.7081743
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.08969026
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.93207544
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.7081743
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.08969026
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.93207544
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1248,7 +1308,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -1285,27 +1345,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1352,6 +1420,10 @@ PrefabInstance:
       value: Sphere_0_1
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: sphereColor
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
       value: 
       objectReference: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
@@ -1386,27 +1458,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.1012388
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.90943396
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7863952
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.1012388
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.90943396
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7863952
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1454,7 +1538,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -1491,27 +1575,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.082698405
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.24219337
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.381132
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.082698405
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.24219337
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.381132
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1559,7 +1655,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -1596,27 +1692,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.9490196
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.082352936
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7728982
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.9490196
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.082352936
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7728982
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1701,27 +1805,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.1012388
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.90943396
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7863952
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.1012388
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.90943396
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7863952
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1769,7 +1885,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -1806,27 +1922,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.82
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1873,6 +2001,10 @@ PrefabInstance:
       value: Sphere_4_1
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: sphereColor
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
       value: 
       objectReference: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
@@ -1907,27 +2039,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.9490196
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.082352936
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7728982
+      value: 0.82
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.9490196
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.082352936
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7728982
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1975,7 +2119,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -2012,27 +2156,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.082698405
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.24219337
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.381132
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.082698405
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.24219337
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.381132
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2117,27 +2273,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.7081743
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.08969026
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.93207544
+      value: 0.82
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.7081743
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.08969026
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.93207544
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2222,27 +2390,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.1012388
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.90943396
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7863952
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.1012388
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.90943396
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7863952
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2327,27 +2507,35 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.9490196
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.082352936
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7728982
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.9490196
+      value: 0.58
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.082352936
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7728982
+      value: 0.32
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2432,27 +2620,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.7081743
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.08969026
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.93207544
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.7081743
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.08969026
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.93207544
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2500,7 +2700,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -2537,27 +2737,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.082698405
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.24219337
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.381132
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.082698405
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.24219337
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.381132
+      value: 0.05
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.25
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.07
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2605,7 +2817,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: sphereColor
-      value: 4
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
@@ -2642,27 +2854,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.1012388
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.90943396
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7863952
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.1012388
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.90943396
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7863952
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2747,27 +2971,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.1012388
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.90943396
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7863952
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.1012388
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.90943396
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7863952
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2852,27 +3088,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -2919,6 +3167,10 @@ PrefabInstance:
       value: Sphere_0_3
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: sphereColor
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
       value: 
       objectReference: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
@@ -2953,27 +3205,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.82
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3020,6 +3284,10 @@ PrefabInstance:
       value: Sphere_2_2
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: sphereColor
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
       value: 
       objectReference: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
@@ -3054,27 +3322,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.7081743
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.08969026
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.93207544
+      value: 0.82
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.7081743
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.08969026
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.93207544
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3159,27 +3439,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3226,6 +3518,10 @@ PrefabInstance:
       value: Sphere_2_0
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: sphereColor
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
       value: 
       objectReference: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
@@ -3260,27 +3556,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.7081743
+      value: 0.52
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.08969026
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.93207544
+      value: 0.82
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.7081743
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.08969026
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.93207544
+      value: 0.52
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3365,27 +3673,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.89433956
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.15295655
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.106308244
+      value: 0.55
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.89433956
+      value: 0.07
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.15295655
+      value: 0.18
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.106308244
+      value: 0.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.06
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.13
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3432,6 +3752,10 @@ PrefabInstance:
       value: Sphere_4_2
       objectReference: {fileID: 0}
     - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: sphereColor
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: colorPalette
       value: 
       objectReference: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
@@ -3466,27 +3790,39 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.b
-      value: 0.1012388
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.g
-      value: 0.90943396
+      value: 0.62
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: glowColor.r
-      value: 0.7863952
+      value: 0.85
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.b
-      value: 0.1012388
+      value: 0.05
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.g
-      value: 0.90943396
+      value: 0.38
       objectReference: {fileID: 0}
     - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: liquidColor.r
-      value: 0.7863952
+      value: 0.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.b
+      value: 0.02
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.g
+      value: 0.14
+      objectReference: {fileID: 0}
+    - target: {fileID: 1299381581586927554, guid: 2757266308e987344b2d75a62d387140, type: 3}
+      propertyPath: outlineColor.r
+      value: 0.22
       objectReference: {fileID: 0}
     - target: {fileID: 2287507181854994972, guid: 2757266308e987344b2d75a62d387140, type: 3}
       propertyPath: m_LocalPosition.x

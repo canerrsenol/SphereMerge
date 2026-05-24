@@ -30,7 +30,6 @@ public class RopeGenerator2D : MonoBehaviour
     {
         ConfigureLineRenderers();
         GenerateRope();
-        BreakFromMiddleAfterDelay().Forget();
     }
 
     private void LateUpdate()
@@ -96,12 +95,6 @@ public class RopeGenerator2D : MonoBehaviour
         _segments[_breakSegmentIndex].DisconnectFromPrevious();
 
         UpdateLineRenderer();
-    }
-
-    private async UniTask BreakFromMiddleAfterDelay()
-    {
-        await UniTask.Delay(5000, cancellationToken: this.GetCancellationTokenOnDestroy());
-        BreakFromMiddle();
     }
 
     private void UpdateLineRenderer()

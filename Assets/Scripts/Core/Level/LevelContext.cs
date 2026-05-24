@@ -6,6 +6,7 @@ using VContainer.Unity;
 public class LevelContext : MonoBehaviour
 {
     [SerializeField] private SpheresManager spheresManager;
+    [SerializeField] private SpheresMergeManager spheresMergeManager;
 
     public void RegisterDependencies(IContainerBuilder builder)
     {
@@ -15,29 +16,16 @@ public class LevelContext : MonoBehaviour
         }
 
         builder.RegisterComponent(this).AsSelf().AsImplementedInterfaces();
-        RegisterSpheresService(builder);
+        builder.RegisterComponent(spheresManager)
+            .As<ISpheresManagerService>()
+            .AsSelf();
+        builder.RegisterComponent(spheresMergeManager)
+            .As<ISpheresMergeManagerService>()
+            .AsSelf();
         RegisterLevelDependencies(builder);
     }
 
     protected virtual void RegisterLevelDependencies(IContainerBuilder builder)
     {
-    }
-
-    private void RegisterSpheresService(IContainerBuilder builder)
-    {
-        if (spheresManager == null)
-        {
-            spheresManager = GetComponentInChildren<SpheresManager>(true);
-        }
-
-        if (spheresManager == null)
-        {
-            Debug.LogError("LevelContext requires a SpheresManager in the level hierarchy.", this);
-            return;
-        }
-
-        builder.RegisterComponent(spheresManager)
-            .As<ISpheresManagerService>()
-            .AsSelf();
     }
 }

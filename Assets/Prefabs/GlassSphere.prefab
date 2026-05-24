@@ -27,8 +27,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 0.035, y: 0.035, z: 0.035}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2287507181854994972}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -104,6 +104,7 @@ GameObject:
   - component: {fileID: 1299381581586927554}
   - component: {fileID: 3197306125530214791}
   - component: {fileID: 8832972290940323696}
+  - component: {fileID: 5821178730450061943}
   m_Layer: 6
   m_Name: GlassSphere
   m_TagString: Untagged
@@ -121,7 +122,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.035, y: 0.035, z: 0.035}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 4533080131439029734}
@@ -139,9 +140,9 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 0.35
   m_LinearDamping: 3
-  m_AngularDamping: 0.05
+  m_AngularDamping: 0.025
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -211,7 +212,7 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 4.3
+  m_Radius: 0.15
 --- !u!114 &8832972290940323696
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,7 +225,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cd462bc28376d24791978772b44f7f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlassSphere2D
-  canSelect: 1
   sphereColor: 0
   colorPalette: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
   spriteLiquid: {fileID: 1299381581586927554}
+  contactSensor: {fileID: 5821178730450061943}
+--- !u!114 &5821178730450061943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7688381267545841004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1aa51ec1acc4c369f371a1cc317e45b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SphereContactSensor2D
+  sphere: {fileID: 8832972290940323696}
