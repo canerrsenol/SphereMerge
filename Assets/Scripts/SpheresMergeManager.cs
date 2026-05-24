@@ -9,12 +9,11 @@ public sealed class SpheresMergeManager : MonoBehaviour
     private const int MergeCount = 3;
 
     [Header("Animation")]
-    [Min(0.01f)] [SerializeField] private float mergeDuration = 0.18f;
+    [Min(0.01f)][SerializeField] private float mergeDuration = 0.18f;
     [SerializeField] private Ease mergeEase = Ease.InBack;
 
     private readonly List<SphereContact> contacts = new List<SphereContact>();
     private readonly List<GlassSphere2D> mergeCandidates = new List<GlassSphere2D>(MergeCount);
-    private readonly HashSet<GlassSphere2D> mergingSpheres = new HashSet<GlassSphere2D>();
 
     public void ReportSphereContact(GlassSphere2D first, GlassSphere2D second)
     {
@@ -112,9 +111,8 @@ public sealed class SpheresMergeManager : MonoBehaviour
                 continue;
             }
 
-            mergingSpheres.Add(sphere);
+            sphere.SetSphereState(SphereState.Merged);
             RemoveContactsWith(sphere);
-            DisableSpherePhysics(sphere);
 
             Transform sphereTransform = sphere.transform;
             sequence.Group(Tween.PositionX(sphereTransform, mergePosition.x, mergeDuration, mergeEase));
@@ -135,7 +133,6 @@ public sealed class SpheresMergeManager : MonoBehaviour
                 continue;
             }
 
-            mergingSpheres.Remove(sphere);
             Destroy(sphere.gameObject);
         }
     }
@@ -151,8 +148,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
     private bool CanMerge(GlassSphere2D sphere)
     {
         return sphere != null
-            && !sphere.CanSelect
-            && !mergingSpheres.Contains(sphere);
+            && sphere.CurrentState == SphereState.Selected;
     }
 
     private bool ContainsContact(SphereContact contact)
@@ -208,29 +204,6 @@ public sealed class SpheresMergeManager : MonoBehaviour
         }
 
         return count > 0 ? total / count : Vector3.zero;
-    }
-
-    private static void DisableSpherePhysics(GlassSphere2D sphere)
-    {
-        SphereContactSensor2D sensor = sphere.GetComponentInChildren<SphereContactSensor2D>();
-        if (sensor != null)
-        {
-            sensor.enabled = false;
-        }
-
-        Rigidbody2D sphereRigidbody = sphere.GetComponent<Rigidbody2D>();
-        if (sphereRigidbody != null)
-        {
-            sphereRigidbody.linearVelocity = Vector2.zero;
-            sphereRigidbody.angularVelocity = 0f;
-            sphereRigidbody.simulated = false;
-        }
-
-        Collider2D[] colliders = sphere.GetComponentsInChildren<Collider2D>();
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            colliders[i].enabled = false;
-        }
     }
 
     private readonly struct SphereContact

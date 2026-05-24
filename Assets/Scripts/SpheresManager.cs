@@ -53,6 +53,16 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         ApplySphereColorPalettes();
     }
 
+    public void ReportSphereSelected(GlassSphere2D sphere)
+    {
+        if (sphere == null || !TryFindSpherePosition(sphere, out Vector2Int position))
+        {
+            return;
+        }
+
+        ActivateSphereAbove(position);
+    }
+
     public void SetGridSettings(Vector2Int newGridSize, Vector2 newTileOffset, bool alignTransform, float topLocalY)
     {
         gridSize = newGridSize;
@@ -213,6 +223,35 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         return true;
     }
 
+    private bool TryFindSpherePosition(GlassSphere2D targetSphere, out Vector2Int position)
+    {
+        position = default;
+
+        if (!IsGridSizeValid || spheres == null || targetSphere == null)
+        {
+            return false;
+        }
+
+        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
+        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (spheres[x, y] != targetSphere)
+                {
+                    continue;
+                }
+
+                position = new Vector2Int(x, y);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void ResizeSpheresPreservingPositions()
     {
         GlassSphere2D[,] previousSpheres = spheres;
@@ -294,6 +333,47 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
         }
     }
 
+    private void ActivateFirstSpheresInColumns()
+    {
+        if (!IsGridSizeValid || spheres == null)
+        {
+            return;
+        }
+
+        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
+        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                GlassSphere2D sphere = spheres[x, y];
+                if (sphere == null)
+                {
+                    continue;
+                }
+
+                if (sphere.CurrentState == SphereState.Idle)
+                {
+                    sphere.SetSphereState(SphereState.IdleFirstInColumn);
+                }
+
+                break;
+            }
+        }
+    }
+
+    private void ActivateSphereAbove(Vector2Int position)
+    {
+        Vector2Int abovePosition = new Vector2Int(position.x, position.y + 1);
+        GlassSphere2D aboveSphere = GetSphere(abovePosition);
+
+        if (aboveSphere != null && aboveSphere.CurrentState == SphereState.Idle)
+        {
+            aboveSphere.SetSphereState(SphereState.IdleFirstInColumn);
+        }
+    }
+
     private void PlayIntroAnimation()
     {
         if (!IsGridSizeValid || spheres == null)
@@ -309,6 +389,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
 
         int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
         int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
+        bool hasIntroTween = false;
 
         for (int x = 0; x < width; x++)
         {
@@ -330,7 +411,17 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
                     duration,
                     ease,
                     startDelay: (x + y) * stagger));
+                hasIntroTween = true;
             }
+        }
+
+        if (hasIntroTween)
+        {
+            introSequence.ChainCallback(ActivateFirstSpheresInColumns);
+        }
+        else
+        {
+            ActivateFirstSpheresInColumns();
         }
     }
 

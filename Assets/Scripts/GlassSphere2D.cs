@@ -1,4 +1,7 @@
 using UnityEngine;
+using VContainer;
+
+public enum SphereState {Idle, IdleFirstInColumn, Selected, Merged}
 
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class GlassSphere2D : MonoBehaviour, ISelectable
@@ -10,11 +13,18 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     [SerializeField] private GlassSphereVisual2D sphereVisual;
 
     private Rigidbody2D _rigidbody2D;
-    private bool canSelect;
+    private ISpheresManagerService spheresManagerService;
+    private SphereState currentState = SphereState.Idle;
+    private bool canSelect = false;
+    private Collider2D[] colliders;
+    private bool[] initialColliderEnabledStates;
     private bool outlineVisible;
+
+    private const float IdleGravityScale = 0f;
     private const float SelectedGravityScale = 1f;
 
     public bool CanSelect => canSelect;
+    public SphereState CurrentState => currentState;
     public SphereColors SphereColor => sphereColor;
     public SpriteLiquid2D SpriteLiquid => spriteLiquid;
 
@@ -22,12 +32,8 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
         CacheReferences();
-        if (contactSensor != null)
-        {
-            contactSensor.enabled = false;
-        }
-
-        SetOutlineVisible(false, true);
+        CacheColliders(true);
+        ApplyState(currentState, true);
         ApplySphereColor();
     }
 
@@ -42,9 +48,15 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplySphereColor();
     }
 
+    [Inject]
+    public void Construct(ISpheresManagerService spheresManagerService)
+    {
+        this.spheresManagerService = spheresManagerService;
+    }
+
     private void Update()
     {
-        bool shouldShowOutline = !canSelect
+        bool shouldShowOutline = currentState == SphereState.Selected
             && contactSensor != null
             && contactSensor.enabled
             && contactSensor.hasContact;
@@ -54,9 +66,13 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 
     public void OnSelect()
     {
-        if (!canSelect)
+        if (!canSelect || currentState != SphereState.IdleFirstInColumn)
         {
-            sphereVisual?.PlayCannotSelectAnimation();
+            if (currentState == SphereState.Idle)
+            {
+                sphereVisual?.PlayCannotSelectAnimation();
+            }
+
             return;
         }
 
@@ -71,12 +87,19 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
             }
         }
 
-        canSelect = false;
-        _rigidbody2D.gravityScale = SelectedGravityScale;
-        if (contactSensor != null)
+        SetSphereState(SphereState.Selected);
+        spheresManagerService?.ReportSphereSelected(this);
+    }
+
+    public void SetSphereState(SphereState newState)
+    {
+        if (currentState == newState)
         {
-            contactSensor.enabled = true;
+            return;
         }
+
+        currentState = newState;
+        ApplyState(newState);
     }
 
     public void SetSphereColor(SphereColors color)
@@ -108,6 +131,114 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         if (sphereVisual == null)
         {
             sphereVisual = GetComponentInChildren<GlassSphereVisual2D>(true);
+        }
+
+        CacheColliders();
+    }
+
+    private void CacheColliders(bool force = false)
+    {
+        Collider2D[] foundColliders = GetComponentsInChildren<Collider2D>(true);
+        if (!force && colliders != null && colliders.Length == foundColliders.Length)
+        {
+            return;
+        }
+
+        colliders = foundColliders;
+        initialColliderEnabledStates = new bool[colliders.Length];
+
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            initialColliderEnabledStates[i] = colliders[i] != null && colliders[i].enabled;
+        }
+    }
+
+    private void ApplyState(SphereState state, bool forceOutline = false)
+    {
+        CacheReferences();
+
+        switch (state)
+        {
+            case SphereState.Idle:
+                canSelect = false;
+                SetRigidbodyActive(true);
+                SetCollidersEnabled(true);
+                SetGravityScale(IdleGravityScale);
+                SetContactSensorEnabled(false);
+                SetOutlineVisible(false, forceOutline);
+                break;
+            
+            case SphereState.IdleFirstInColumn:
+                canSelect = true;
+                SetRigidbodyActive(true);
+                SetCollidersEnabled(true);
+                SetGravityScale(IdleGravityScale);
+                SetContactSensorEnabled(false);
+                SetOutlineVisible(false, forceOutline);
+                break;
+
+            case SphereState.Selected:
+                canSelect = false;
+                SetRigidbodyActive(true);
+                SetCollidersEnabled(true);
+                SetGravityScale(SelectedGravityScale);
+                SetContactSensorEnabled(true);
+                break;
+
+            case SphereState.Merged:
+                canSelect = false;
+                SetContactSensorEnabled(false);
+                SetOutlineVisible(true, forceOutline);
+                SetRigidbodyActive(false);
+                SetCollidersEnabled(false);
+                break;
+        }
+    }
+
+    private void SetGravityScale(float gravityScale)
+    {
+        if (_rigidbody2D != null)
+        {
+            _rigidbody2D.gravityScale = gravityScale;
+        }
+    }
+
+    private void SetRigidbodyActive(bool active)
+    {
+        if (_rigidbody2D == null)
+        {
+            return;
+        }
+
+        if (!active)
+        {
+            _rigidbody2D.linearVelocity = Vector2.zero;
+            _rigidbody2D.angularVelocity = 0f;
+        }
+
+        _rigidbody2D.simulated = active;
+    }
+
+    private void SetContactSensorEnabled(bool enabled)
+    {
+        if (contactSensor != null)
+        {
+            contactSensor.enabled = enabled;
+        }
+    }
+
+    private void SetCollidersEnabled(bool enabled)
+    {
+        CacheColliders();
+
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            if (colliders[i] == null)
+            {
+                continue;
+            }
+
+            colliders[i].enabled = enabled && initialColliderEnabledStates[i];
         }
     }
 
