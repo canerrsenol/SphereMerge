@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4533080131439029734}
   - component: {fileID: 1139133706837655801}
+  - component: {fileID: 8338213774440825230}
   m_Layer: 6
   m_Name: Visual
   m_TagString: Untagged
@@ -91,6 +92,23 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!114 &8338213774440825230
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3727047558026325357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cf605249ee056f4eb642b0c92f4d184, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GlassSphereVisual2D
+  duration: 0.18
+  shakeDistance: 0.04
+  verticalShakeDistance: 0.025
+  shakeStepCount: 3
+  ease: 3
 --- !u!1 &7688381267545841004
 GameObject:
   m_ObjectHideFlags: 0
@@ -229,6 +247,7 @@ MonoBehaviour:
   colorPalette: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
   spriteLiquid: {fileID: 1299381581586927554}
   contactSensor: {fileID: 5821178730450061943}
+  sphereVisual: {fileID: 8338213774440825230}
 --- !u!114 &5821178730450061943
 MonoBehaviour:
   m_ObjectHideFlags: 0

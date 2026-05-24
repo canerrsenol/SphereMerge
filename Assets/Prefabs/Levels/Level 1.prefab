@@ -241,6 +241,7 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+  obstacles: []
   spherePrefab: {fileID: 8832972290940323696, guid: 2757266308e987344b2d75a62d387140, type: 3}
   sphereColors: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
   gridSize: {x: 6, y: 4}
@@ -839,8 +840,8 @@ MonoBehaviour:
   segmentPrefab: {fileID: 3651415340063810711, guid: 9c31f90802532af4d8edc6964602b509, type: 3}
   lineRenderer: {fileID: 3404751266668456025}
   rightLineRenderer: {fileID: 8616107815567706608}
-  sagAmount: 0.31
-  segmentRadius: 0.04
+  sagAmount: 0.03
+  segmentRadius: 0.05
   showEditorPreview: 1
   previewLineColor: {r: 0.2, g: 0.8, b: 1, a: 1}
   previewSegmentColor: {r: 1, g: 0.85, b: 0.2, a: 1}

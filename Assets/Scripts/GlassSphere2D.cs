@@ -7,9 +7,10 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     [SerializeField] private SphereColorsSO colorPalette;
     [SerializeField] private SpriteLiquid2D spriteLiquid;
     [SerializeField] private SphereContactSensor2D contactSensor;
+    [SerializeField] private GlassSphereVisual2D sphereVisual;
 
     private Rigidbody2D _rigidbody2D;
-    private bool canSelect = true;
+    private bool canSelect;
     private bool outlineVisible;
     private const float SelectedGravityScale = 1f;
 
@@ -55,7 +56,19 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     {
         if (!canSelect)
         {
+            sphereVisual?.PlayCannotSelectAnimation();
             return;
+        }
+
+        // Check if any click obstacles prevent selection
+        var clickObstacles = GetComponentsInChildren<IClickManipulatorObstacle>();
+        foreach (var obstacle in clickObstacles)
+        {
+            if (!obstacle.CanClick)
+            {
+                sphereVisual?.PlayCannotSelectAnimation();
+                return;
+            }
         }
 
         canSelect = false;
@@ -90,6 +103,11 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         if (contactSensor == null)
         {
             contactSensor = GetComponentInChildren<SphereContactSensor2D>(true);
+        }
+
+        if (sphereVisual == null)
+        {
+            sphereVisual = GetComponentInChildren<GlassSphereVisual2D>(true);
         }
     }
 

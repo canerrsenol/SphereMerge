@@ -11,7 +11,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour, ISpheresManagerSer
     private const float DefaultIntroDuration = 0.25f;
     private const float DefaultIntroStagger = 0.03f;
     private const Ease DefaultIntroEase = Ease.OutBack;
-
+    [SerializeField] private ObstacleBaseAbstract[] obstacles;
     [SerializeField] private GlassSphere2D spherePrefab;
     [SerializeField] private SphereColorsSO sphereColors;
     [SerializeField, HideInInspector] private Vector2Int gridSize;
