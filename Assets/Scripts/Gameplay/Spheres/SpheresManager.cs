@@ -1,29 +1,20 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
-using PrimeTween;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-// Stores the level sphere grid and controls sphere activation and intro visuals.
+// Stores level sphere grid data and applies its shared layout values.
 public sealed class SpheresManager : SerializedMonoBehaviour
 {
-    private const float DefaultIntroDuration = 0.25f;
-    private const float DefaultIntroStagger = 0.03f;
-    private const Ease DefaultIntroEase = Ease.OutBack;
     [SerializeField] private SphereObstacleCatalogSO obstacleCatalog;
     [SerializeField] private GlassSphere2D spherePrefab;
     [SerializeField] private SphereColorsSO sphereColors;
     [SerializeField, HideInInspector] private Vector2Int gridSize;
     [FormerlySerializedAs("spacing")]
     [SerializeField, HideInInspector] private Vector2 tileOffset = Vector2.one;
-    [SerializeField] private SphereIntroAnimationSettingsSO introAnimationSettings;
     [SerializeField, HideInInspector] private Vector2Int storedGridSize;
     [OdinSerialize, HideInInspector] private GlassSphere2D[,] spheres = new GlassSphere2D[0, 0];
-
-    private Sequence introSequence;
 
     public GlassSphere2D SpherePrefab => spherePrefab;
     public SphereColorsSO SphereColors => sphereColors;
@@ -32,34 +23,10 @@ public sealed class SpheresManager : SerializedMonoBehaviour
     public Vector2 TileOffset => tileOffset;
     public bool IsGridSizeValid => gridSize.x > 0 && gridSize.y > 0;
 
-    // Starts listening for sphere selections in this grid.
-    private void OnEnable()
-    {
-        EventBus.Subscribe<SphereSelectedEvent>(HandleSphereSelected);
-    }
-
-    // Stops listening for sphere selections in this grid.
-    private void OnDisable()
-    {
-        EventBus.Unsubscribe<SphereSelectedEvent>(HandleSphereSelected);
-    }
-
-    // Applies palette data and plays the opening sphere animation.
+    // Applies shared palette data when gameplay starts.
     private void Start()
     {
         ApplySphereColorPalettes();
-        PlayIntroAnimation();
-    }
-
-    // Stops the intro animation when this grid is destroyed.
-    private void OnDestroy()
-    {
-        if (introSequence.isAlive)
-        {
-            introSequence.Stop();
-        }
-
-        introSequence = default;
     }
 
     // Keeps grid data, positions, and colors updated in the inspector.
@@ -69,18 +36,6 @@ public sealed class SpheresManager : SerializedMonoBehaviour
         EnsureGridDataSize();
         ApplySpherePositions();
         ApplySphereColorPalettes();
-    }
-
-    // Activates the next sphere above a selected grid sphere.
-    private void HandleSphereSelected(SphereSelectedEvent selectionEvent)
-    {
-        GlassSphere2D sphere = selectionEvent.SelectedSphere;
-        if (sphere == null || !TryFindSpherePosition(sphere, out Vector2Int position))
-        {
-            return;
-        }
-
-        ActivateSphereAbove(position);
     }
 
     // Updates grid dimensions, spacing, and optional alignment.
@@ -286,7 +241,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour
     }
 
     // Finds the grid cell that contains a sphere instance.
-    private bool TryFindSpherePosition(GlassSphere2D targetSphere, out Vector2Int position)
+    public bool TryFindSpherePosition(GlassSphere2D targetSphere, out Vector2Int position)
     {
         position = default;
 
@@ -399,109 +354,4 @@ public sealed class SpheresManager : SerializedMonoBehaviour
         }
     }
 
-    // Makes the bottom available sphere in each column selectable.
-    private void ActivateFirstSpheresInColumns()
-    {
-        if (!IsGridSizeValid || spheres == null)
-        {
-            return;
-        }
-
-        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
-        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                GlassSphere2D sphere = spheres[x, y];
-                if (sphere == null)
-                {
-                    continue;
-                }
-
-                if (sphere.CurrentState == SphereState.Idle)
-                {
-                    sphere.SetSphereState(SphereState.IdleFirstInColumn);
-                }
-
-                break;
-            }
-        }
-    }
-
-    // Makes the sphere above a selected one selectable.
-    private void ActivateSphereAbove(Vector2Int position)
-    {
-        Vector2Int abovePosition = new Vector2Int(position.x, position.y + 1);
-        GlassSphere2D aboveSphere = GetSphere(abovePosition);
-
-        if (aboveSphere != null && aboveSphere.CurrentState == SphereState.Idle)
-        {
-            aboveSphere.SetSphereState(SphereState.IdleFirstInColumn);
-        }
-    }
-
-    // Animates sphere entry and then enables first selections.
-    private void PlayIntroAnimation()
-    {
-        if (!IsGridSizeValid || spheres == null)
-        {
-            return;
-        }
-
-        introSequence = Sequence.Create();
-
-        float duration = introAnimationSettings != null ? introAnimationSettings.Duration : DefaultIntroDuration;
-        float stagger = introAnimationSettings != null ? introAnimationSettings.Stagger : DefaultIntroStagger;
-        Ease ease = introAnimationSettings != null ? introAnimationSettings.Ease : DefaultIntroEase;
-
-        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
-        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
-        bool hasIntroTween = false;
-
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                GlassSphere2D sphere = spheres[x, y];
-                if (sphere == null)
-                {
-                    continue;
-                }
-
-                Transform sphereTransform = sphere.transform;
-                Vector3 targetScale = sphereTransform.localScale;
-                sphereTransform.localScale = Vector3.zero;
-
-                introSequence.Group(Tween.Scale(
-                    sphereTransform,
-                    targetScale,
-                    duration,
-                    ease,
-                    startDelay: (x + y) * stagger));
-                hasIntroTween = true;
-            }
-        }
-
-        if (hasIntroTween)
-        {
-            introSequence.ChainCallback(ActivateFirstSpheresInColumns);
-        }
-        else
-        {
-            ActivateFirstSpheresInColumns();
-        }
-    }
-
-    [Button("Edit Level")]
-    // Opens the custom grid editor for this manager.
-    private void OpenLevelEditor()
-    {
-#if UNITY_EDITOR
-        Type editorWindowType = Type.GetType("SpheresManagerEditorWindow, Assembly-CSharp-Editor");
-        MethodInfo openMethod = editorWindowType?.GetMethod("Open", BindingFlags.Public | BindingFlags.Static);
-        openMethod?.Invoke(null, new object[] { this });
-#endif
-    }
 }

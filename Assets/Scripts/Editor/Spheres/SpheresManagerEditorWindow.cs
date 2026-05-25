@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 
 // Provides a custom Unity editor for building sphere level grids.
@@ -195,88 +194,15 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
             return;
         }
 
-        bool shouldCenterTransform = gridSize != spheresManager.GridSize || tileOffset != spheresManager.TileOffset;
         bool gridSizeChanged = gridSize != spheresManager.GridSize;
-        float topLocalY = spheresManager.GetGridTopLocalY();
-        List<GlassSphere2D> spheresOutsideNewGrid = gridSizeChanged ? GetSpheresOutsideGrid(gridSize) : null;
-
-        Undo.RecordObject(spheresManager, "Change Sphere Grid Settings");
-        Undo.RecordObject(spheresManager.transform, "Change Sphere Grid Settings");
-
-        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
-        for (int i = 0; i < childSpheres.Length; i++)
-        {
-            GlassSphere2D sphere = childSpheres[i];
-            if (sphere != null && sphere.transform.IsChildOf(spheresManager.transform))
-            {
-                Undo.RecordObject(sphere.transform, "Change Sphere Grid Settings");
-            }
-        }
-
-        spheresManager.SetGridSettings(gridSize, tileOffset, shouldCenterTransform, topLocalY);
-        DestroySpheres(spheresOutsideNewGrid);
+        SpheresGridEditorOperations.SetGridSettings(spheresManager, gridSize, tileOffset);
 
         if (gridSizeChanged)
         {
             FillEmptyGridCells();
         }
 
-        MarkDirty(spheresManager);
-        MarkDirty(spheresManager.transform);
-        for (int i = 0; i < childSpheres.Length; i++)
-        {
-            GlassSphere2D sphere = childSpheres[i];
-            if (sphere != null && sphere.transform.IsChildOf(spheresManager.transform))
-            {
-                MarkDirty(sphere.transform);
-            }
-        }
-
         Repaint();
-    }
-
-    // Finds spheres that fall outside a smaller grid size.
-    private List<GlassSphere2D> GetSpheresOutsideGrid(Vector2Int newGridSize)
-    {
-        List<GlassSphere2D> spheresOutsideGrid = new List<GlassSphere2D>();
-        Vector2Int currentGridSize = spheresManager.GridSize;
-
-        for (int x = 0; x < currentGridSize.x; x++)
-        {
-            for (int y = 0; y < currentGridSize.y; y++)
-            {
-                if (x < newGridSize.x && y < newGridSize.y)
-                {
-                    continue;
-                }
-
-                GlassSphere2D sphere = spheresManager.GetSphere(new Vector2Int(x, y));
-                if (sphere != null && !spheresOutsideGrid.Contains(sphere))
-                {
-                    spheresOutsideGrid.Add(sphere);
-                }
-            }
-        }
-
-        return spheresOutsideGrid;
-    }
-
-    // Deletes sphere objects removed by a grid resize.
-    private void DestroySpheres(List<GlassSphere2D> spheresToDestroy)
-    {
-        if (spheresToDestroy == null)
-        {
-            return;
-        }
-
-        for (int i = 0; i < spheresToDestroy.Count; i++)
-        {
-            GlassSphere2D sphere = spheresToDestroy[i];
-            if (sphere != null)
-            {
-                Undo.DestroyObjectImmediate(sphere.gameObject);
-            }
-        }
     }
 
     // Draws and applies the shared sphere color palette field.
@@ -294,11 +220,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
             return;
         }
 
-        Undo.RecordObject(spheresManager, "Change Sphere Colors");
-        RecordChildLiquidObjects("Change Sphere Colors");
-        spheresManager.SetSphereColors(sphereColors);
-        MarkDirty(spheresManager);
-        MarkChildLiquidObjectsDirty();
+        SpheresGridEditorOperations.SetSphereColors(spheresManager, sphereColors);
         Repaint();
     }
 
@@ -324,7 +246,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
                     continue;
                 }
 
-                GlassSphere2D sphere = CreateSphere(position);
+                GlassSphere2D sphere = SpheresGridEditorOperations.CreateSphere(spheresManager, position);
                 if (sphere == null)
                 {
                     continue;
@@ -332,10 +254,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
 
                 sphere.SetSphereColor(defaultColor);
                 spheresManager.SetSphere(position, sphere);
-                MarkDirty(sphere.gameObject);
-                MarkDirty(sphere.transform);
-                MarkDirty(sphere);
-                MarkDirty(sphere.SpriteLiquid);
+                SpheresGridEditorOperations.MarkSphereDirty(sphere);
             }
         }
     }
@@ -347,7 +266,8 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
 
         if (GUILayout.Button("Clear Grid", GUILayout.Height(28f)))
         {
-            ClearGrid();
+            SpheresGridEditorOperations.ClearGrid(spheresManager);
+            Repaint();
         }
 
         GUILayout.FlexibleSpace();
@@ -391,7 +311,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
     {
         GlassSphere2D sphere = spheresManager.GetSphere(position);
         Color backgroundColor = sphere != null ? GetEditorColor(sphere.SphereColor) : new Color(0.18f, 0.18f, 0.18f, 1f);
-        ObstacleBaseAbstract obstacle = sphere != null ? GetSphereObstacle(sphere) : null;
+        ObstacleBaseAbstract obstacle = sphere != null ? SpheresGridEditorOperations.GetSphereObstacle(sphere) : null;
 
         EditorGUI.DrawRect(rect, backgroundColor);
         DrawRectOutline(rect, sphere != null ? Color.white : new Color(0.45f, 0.45f, 0.45f, 1f), 1f);
@@ -413,49 +333,22 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
             return;
         }
 
-        if (spheresManager.SpherePrefab == null)
-        {
-            EditorUtility.DisplayDialog(WindowTitle, "Assign a GlassSphere2D prefab before placing spheres.", "OK");
-            return;
-        }
-
-        GlassSphere2D sphere = spheresManager.GetSphere(position);
-        bool isNewSphere = sphere == null;
+        bool isNewSphere = spheresManager.GetSphere(position) == null;
         string undoName = isNewSphere ? "Place Sphere" : "Update Sphere Cell";
+        GlassSphere2D sphere = SpheresGridEditorOperations.PlaceOrUpdateSphere(
+            spheresManager,
+            position,
+            selectedColor,
+            obstaclePaintMode == ObstaclePaintMode.Keep,
+            undoName);
 
-        Undo.RecordObject(spheresManager, undoName);
-        spheresManager.EnsureGridDataSize();
-
-        if (isNewSphere)
+        if (sphere == null)
         {
-            sphere = CreateSphere(position);
-            if (sphere == null)
-            {
-                return;
-            }
-        }
-        else
-        {
-            Undo.RecordObject(sphere, undoName);
-            Undo.RecordObject(sphere.transform, undoName);
-            Undo.RecordObject(sphere.gameObject, undoName);
-            RecordLiquidObject(sphere, undoName);
-            SetupSphere(sphere, position);
-        }
-
-        spheresManager.SetSphere(position, sphere);
-        if (isNewSphere || obstaclePaintMode == ObstaclePaintMode.Keep)
-        {
-            sphere.SetSphereColor(selectedColor);
+            return;
         }
 
         ApplySelectedObstaclePaint(sphere, undoName);
 
-        MarkDirty(spheresManager);
-        MarkDirty(sphere.gameObject);
-        MarkDirty(sphere.transform);
-        MarkDirty(sphere);
-        MarkDirty(sphere.SpriteLiquid);
         Repaint();
     }
 
@@ -473,159 +366,17 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
                 return;
 
             case ObstaclePaintMode.Clear:
-                ClearSphereObstacles(sphere);
+                SpheresGridEditorOperations.ClearSphereObstacles(sphere);
                 return;
 
             case ObstaclePaintMode.Set:
                 if (selectedObstaclePrefab != null)
                 {
-                    SetSphereObstacle(sphere, selectedObstaclePrefab, undoName);
+                    SpheresGridEditorOperations.SetSphereObstacle(sphere, selectedObstaclePrefab, undoName);
                 }
 
                 return;
         }
-    }
-
-    // Replaces a sphere obstacle with the selected prefab.
-    private void SetSphereObstacle(GlassSphere2D sphere, ObstacleBaseAbstract obstaclePrefab, string undoName)
-    {
-        ClearSphereObstacles(sphere);
-
-        GameObject prefabObject = obstaclePrefab.gameObject;
-        GameObject instanceObject = PrefabUtility.InstantiatePrefab(prefabObject, sphere.transform) as GameObject;
-
-        if (instanceObject == null)
-        {
-            instanceObject = UnityEngine.Object.Instantiate(prefabObject, sphere.transform);
-        }
-
-        Undo.RegisterCreatedObjectUndo(instanceObject, undoName);
-        instanceObject.name = prefabObject.name;
-
-        Transform instanceTransform = instanceObject.transform;
-        Undo.RecordObject(instanceTransform, undoName);
-        instanceTransform.localPosition = Vector3.zero;
-        instanceTransform.localRotation = Quaternion.identity;
-
-        MarkDirty(instanceObject);
-        MarkDirty(instanceTransform);
-        MarkDirty(instanceObject.GetComponent<ObstacleBaseAbstract>());
-    }
-
-    // Removes all obstacle objects attached to a sphere.
-    private static void ClearSphereObstacles(GlassSphere2D sphere)
-    {
-        if (sphere == null)
-        {
-            return;
-        }
-
-        ObstacleBaseAbstract[] obstacles = sphere.GetComponentsInChildren<ObstacleBaseAbstract>(true);
-        HashSet<GameObject> rootObjects = new HashSet<GameObject>();
-
-        for (int i = 0; i < obstacles.Length; i++)
-        {
-            ObstacleBaseAbstract obstacle = obstacles[i];
-            if (obstacle == null || obstacle.transform == sphere.transform)
-            {
-                continue;
-            }
-
-            GameObject rootObject = GetObstacleRootObject(sphere.transform, obstacle.transform);
-            if (rootObject != null)
-            {
-                rootObjects.Add(rootObject);
-            }
-        }
-
-        foreach (GameObject rootObject in rootObjects)
-        {
-            if (rootObject != null)
-            {
-                Undo.DestroyObjectImmediate(rootObject);
-            }
-        }
-    }
-
-    // Instantiates a sphere prefab for one grid cell.
-    private GlassSphere2D CreateSphere(Vector2Int position)
-    {
-        GameObject prefabObject = spheresManager.SpherePrefab.gameObject;
-        GameObject instanceObject = PrefabUtility.InstantiatePrefab(prefabObject, spheresManager.transform) as GameObject;
-
-        if (instanceObject == null)
-        {
-            instanceObject = UnityEngine.Object.Instantiate(prefabObject, spheresManager.transform);
-        }
-
-        Undo.RegisterCreatedObjectUndo(instanceObject, "Create Sphere");
-
-        GlassSphere2D sphere = instanceObject.GetComponent<GlassSphere2D>();
-        if (sphere == null)
-        {
-            Undo.DestroyObjectImmediate(instanceObject);
-            EditorUtility.DisplayDialog(WindowTitle, "The assigned prefab does not contain GlassSphere2D.", "OK");
-            return null;
-        }
-
-        SetupSphere(sphere, position);
-        return sphere;
-    }
-
-    // Parents and positions a sphere inside its grid cell.
-    private void SetupSphere(GlassSphere2D sphere, Vector2Int position)
-    {
-        if (sphere == null)
-        {
-            return;
-        }
-
-        if (sphere.transform.parent != spheresManager.transform)
-        {
-            Undo.SetTransformParent(sphere.transform, spheresManager.transform, "Parent Sphere");
-        }
-
-        sphere.name = $"Sphere_{position.x}_{position.y}";
-        sphere.transform.localPosition = spheresManager.GetLocalPosition(position);
-        sphere.SetColorPalette(spheresManager.SphereColors);
-    }
-
-    // Gets the first obstacle currently attached to a sphere.
-    private static ObstacleBaseAbstract GetSphereObstacle(GlassSphere2D sphere)
-    {
-        if (sphere == null)
-        {
-            return null;
-        }
-
-        ObstacleBaseAbstract[] obstacles = sphere.GetComponentsInChildren<ObstacleBaseAbstract>(true);
-        for (int i = 0; i < obstacles.Length; i++)
-        {
-            ObstacleBaseAbstract obstacle = obstacles[i];
-            if (obstacle != null && obstacle.transform != sphere.transform)
-            {
-                return obstacle;
-            }
-        }
-
-        return null;
-    }
-
-    // Finds the child object that owns an obstacle instance.
-    private static GameObject GetObstacleRootObject(Transform sphereTransform, Transform obstacleTransform)
-    {
-        if (sphereTransform == null || obstacleTransform == null)
-        {
-            return null;
-        }
-
-        Transform root = obstacleTransform;
-        while (root.parent != null && root.parent != sphereTransform)
-        {
-            root = root.parent;
-        }
-
-        return root.parent == sphereTransform ? root.gameObject : obstacleTransform.gameObject;
     }
 
     // Builds the text shown inside one filled grid cell.
@@ -649,33 +400,6 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
 
         string obstacleName = obstacle.gameObject.name.Replace("(Clone)", string.Empty).Trim();
         return ObjectNames.NicifyVariableName(obstacleName);
-    }
-
-    // Deletes all sphere objects and clears the grid data.
-    private void ClearGrid()
-    {
-        if (spheresManager == null)
-        {
-            return;
-        }
-
-        Undo.RecordObject(spheresManager, "Clear Sphere Grid");
-
-        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
-        for (int i = childSpheres.Length - 1; i >= 0; i--)
-        {
-            GlassSphere2D sphere = childSpheres[i];
-            if (sphere == null || !sphere.transform.IsChildOf(spheresManager.transform))
-            {
-                continue;
-            }
-
-            Undo.DestroyObjectImmediate(sphere.gameObject);
-        }
-
-        spheresManager.ClearGridData();
-        MarkDirty(spheresManager);
-        Repaint();
     }
 
     // Loads available sphere color options for painting.
@@ -748,87 +472,4 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return defaultColor;
     }
 
-    // Records sphere visual changes so Unity can undo them.
-    private void RecordChildLiquidObjects(string undoName)
-    {
-        if (spheresManager == null)
-        {
-            return;
-        }
-
-        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
-        for (int i = 0; i < childSpheres.Length; i++)
-        {
-            if (childSpheres[i] != null)
-            {
-                Undo.RecordObject(childSpheres[i], undoName);
-            }
-
-            RecordLiquidObject(childSpheres[i], undoName);
-        }
-    }
-
-    // Records one liquid component for a later undo action.
-    private static void RecordLiquidObject(GlassSphere2D sphere, string undoName)
-    {
-        if (sphere == null || sphere.SpriteLiquid == null)
-        {
-            return;
-        }
-
-        Undo.RecordObject(sphere.SpriteLiquid, undoName);
-    }
-
-    // Marks all sphere visual data as modified in the editor.
-    private void MarkChildLiquidObjectsDirty()
-    {
-        if (spheresManager == null)
-        {
-            return;
-        }
-
-        GlassSphere2D[] childSpheres = spheresManager.GetComponentsInChildren<GlassSphere2D>(true);
-        for (int i = 0; i < childSpheres.Length; i++)
-        {
-            GlassSphere2D sphere = childSpheres[i];
-            if (sphere == null)
-            {
-                continue;
-            }
-
-            MarkDirty(sphere);
-            MarkDirty(sphere.SpriteLiquid);
-        }
-    }
-
-    // Marks an edited object and its prefab or scene as dirty.
-    private static void MarkDirty(UnityEngine.Object target)
-    {
-        if (target == null)
-        {
-            return;
-        }
-
-        EditorUtility.SetDirty(target);
-
-        if (PrefabUtility.IsPartOfPrefabInstance(target))
-        {
-            PrefabUtility.RecordPrefabInstancePropertyModifications(target);
-        }
-
-        GameObject gameObject = null;
-        if (target is Component component)
-        {
-            gameObject = component.gameObject;
-        }
-        else if (target is GameObject targetGameObject)
-        {
-            gameObject = targetGameObject;
-        }
-
-        if (gameObject != null && gameObject.scene.IsValid() && gameObject.scene.isLoaded)
-        {
-            EditorSceneManager.MarkSceneDirty(gameObject.scene);
-        }
-    }
 }

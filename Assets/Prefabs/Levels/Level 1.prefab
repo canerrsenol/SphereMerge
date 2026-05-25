@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7278012706262000347}
   - component: {fileID: 8573588412640128053}
+  - component: {fileID: 910001100000000001}
+  - component: {fileID: 910001100000000002}
   m_Layer: 0
   m_Name: SpheresManager
   m_TagString: Untagged
@@ -118,8 +120,35 @@ MonoBehaviour:
   sphereColors: {fileID: 11400000, guid: e475dade1720c5346bfe79af661d0788, type: 2}
   gridSize: {x: 3, y: 3}
   tileOffset: {x: 0.45, y: 0.45}
-  introAnimationSettings: {fileID: 11400000, guid: 16f659c5ceda36a4f9856dfb8bf08a76, type: 2}
   storedGridSize: {x: 3, y: 3}
+--- !u!114 &910001100000000001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671764538104133216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3a324f2282041e2986507bb9c4a951e, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SphereColumnActivationController
+  spheresManager: {fileID: 8573588412640128053}
+--- !u!114 &910001100000000002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 671764538104133216}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f55753d06eb14f5a91e066b435330bb1, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::SpheresIntroAnimator
+  spheresManager: {fileID: 8573588412640128053}
+  activationController: {fileID: 910001100000000001}
+  animationSettings: {fileID: 11400000, guid: 16f659c5ceda36a4f9856dfb8bf08a76, type: 2}
 --- !u!1 &2881565647992546146
 GameObject:
   m_ObjectHideFlags: 0
