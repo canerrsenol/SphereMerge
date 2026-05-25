@@ -35,11 +35,10 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         window.Show();
     }
 
-    // Prepares palette choices and GUI styles when the window opens.
+    // Prepares palette choices when the window opens.
     private void OnEnable()
     {
         CacheColorOptions();
-        CreateStyles();
     }
 
     // Draws all editor controls and the sphere grid.
