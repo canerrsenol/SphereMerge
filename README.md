@@ -1,5 +1,9 @@
 # Sphere Merge
 
+## Gameplay Preview
+
+https://github.com/user-attachments/assets/5d69d86f-760d-4cbd-a448-4ee4c1ac1391
+
 Sphere Merge is a 2D Unity puzzle game prototype where the player releases colored glass spheres, connects matching groups, and clears each level before its hazards cause failure.
 
 This project was built as a technical case study with a focus on maintainable gameplay code, dependency injection, event-driven communication, configurable content, and a small custom level creation tool.
