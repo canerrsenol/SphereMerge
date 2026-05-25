@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
+// Builds a physical rope from segments and draws its line shape.
 public class RopeGenerator2D : MonoBehaviour
 {
     private const float MinSegmentRadius = 0.001f;
@@ -31,17 +31,20 @@ public class RopeGenerator2D : MonoBehaviour
 
     public event Action Broken;
 
+    // Creates rope segments when gameplay starts.
     private void Start()
     {
         ConfigureLineRenderers();
         GenerateRope();
     }
 
+    // Updates rope line positions after physics movement.
     private void LateUpdate()
     {
         UpdateLineRenderer();
     }
 
+    // Creates and connects all physical rope segments.
     private void GenerateRope()
     {
         ClearRope();
@@ -73,7 +76,7 @@ public class RopeGenerator2D : MonoBehaviour
             previousPosition = position;
         }
 
-        // Son segmenti sag anchor'a bagla.
+        // Connect the last segment to the right anchor.
         RopeSegment2D lastSegment = _segments[^1];
         DistanceJoint2D endJoint = lastSegment.gameObject.AddComponent<DistanceJoint2D>();
         endJoint.autoConfigureConnectedAnchor = false;
@@ -86,11 +89,13 @@ public class RopeGenerator2D : MonoBehaviour
     }
 
     [ContextMenu("Break From Middle")]
+    // Breaks the rope at its middle segment.
     public void BreakFromMiddle()
     {
         BreakAtSegmentIndex(_segments.Count / 2);
     }
 
+    // Disconnects the rope at a requested segment index.
     public void BreakAtSegmentIndex(int segmentIndex)
     {
         if (_segments.Count == 0 || IsBroken)
@@ -103,6 +108,7 @@ public class RopeGenerator2D : MonoBehaviour
         Broken?.Invoke();
     }
 
+    // Draws either a full rope or its two broken pieces.
     private void UpdateLineRenderer()
     {
         ConfigureLineRenderers();
@@ -117,6 +123,7 @@ public class RopeGenerator2D : MonoBehaviour
         UpdateBrokenLineRenderers();
     }
 
+    // Draws one unbroken line between both anchors.
     private void UpdateFullLineRenderer()
     {
         if (lineRenderer == null)
@@ -133,12 +140,14 @@ public class RopeGenerator2D : MonoBehaviour
         lineRenderer.SetPosition(_segments.Count + 1, rightAnchor.position);
     }
 
+    // Updates both visible sides of a broken rope.
     private void UpdateBrokenLineRenderers()
     {
         UpdateLeftBrokenLineRenderer();
         UpdateRightBrokenLineRenderer();
     }
 
+    // Draws the left side of a broken rope.
     private void UpdateLeftBrokenLineRenderer()
     {
         if (lineRenderer == null)
@@ -153,6 +162,7 @@ public class RopeGenerator2D : MonoBehaviour
         }
     }
 
+    // Draws the right side of a broken rope.
     private void UpdateRightBrokenLineRenderer()
     {
         if (rightLineRenderer == null)
@@ -169,12 +179,14 @@ public class RopeGenerator2D : MonoBehaviour
         rightLineRenderer.SetPosition(segmentCount, rightAnchor.position);
     }
 
+    // Sets common options on both rope line renderers.
     private void ConfigureLineRenderers()
     {
         ConfigureLineRenderer(lineRenderer);
         ConfigureLineRenderer(rightLineRenderer);
     }
 
+    // Configures a line renderer to follow world physics positions.
     private void ConfigureLineRenderer(LineRenderer targetLineRenderer)
     {
         if (targetLineRenderer == null)
@@ -183,6 +195,7 @@ public class RopeGenerator2D : MonoBehaviour
         targetLineRenderer.useWorldSpace = true;
     }
 
+    // Removes all visible points from a line renderer.
     private void ClearLineRenderer(LineRenderer targetLineRenderer)
     {
         if (targetLineRenderer == null)
@@ -191,6 +204,7 @@ public class RopeGenerator2D : MonoBehaviour
         targetLineRenderer.positionCount = 0;
     }
 
+    // Converts a world rope point into this object's local space.
     private Vector3 GetLocalRopePosition(Vector2 worldPosition)
     {
         Vector3 localPosition = transform.InverseTransformPoint(worldPosition);
@@ -198,6 +212,7 @@ public class RopeGenerator2D : MonoBehaviour
         return localPosition;
     }
 
+    // Chooses how many segments are needed between the anchors.
     private int CalculateSegmentCount(Vector2 start, Vector2 end)
     {
         float desiredSpacing = GetSafeSegmentRadius() * 2f;
@@ -205,6 +220,7 @@ public class RopeGenerator2D : MonoBehaviour
         return Mathf.Max(1, Mathf.CeilToInt(anchorDistance / desiredSpacing) - 1);
     }
 
+    // Returns a valid radius for generated segments.
     private float GetSafeSegmentRadius()
     {
         if (segmentRadius < MinSegmentRadius || float.IsNaN(segmentRadius) || float.IsInfinity(segmentRadius))
@@ -213,11 +229,13 @@ public class RopeGenerator2D : MonoBehaviour
         return segmentRadius;
     }
 
+    // Keeps the segment radius safe in the inspector.
     private void OnValidate()
     {
         segmentRadius = GetSafeSegmentRadius();
     }
 
+    // Calculates one point on the hanging rope curve.
     private Vector2 CalculateRopePoint(Vector2 start, Vector2 end, float t)
     {
         Vector2 position = Vector2.Lerp(start, end, t);
@@ -226,6 +244,7 @@ public class RopeGenerator2D : MonoBehaviour
         return position;
     }
 
+    // Draws a rope preview while editing the level.
     private void OnDrawGizmos()
     {
         if (!showEditorPreview || leftAnchor == null || rightAnchor == null)
@@ -259,6 +278,7 @@ public class RopeGenerator2D : MonoBehaviour
         }
     }
 
+    // Removes old generated segments and broken line data.
     private void ClearRope()
     {
         _breakSegmentIndex = -1;

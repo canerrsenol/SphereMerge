@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Represents one physics segment used to build a rope.
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(CircleCollider2D))]
 [RequireComponent(typeof(DistanceJoint2D))]
@@ -10,6 +11,7 @@ public class RopeSegment2D : MonoBehaviour
     private CircleCollider2D _collider;
     private DistanceJoint2D _joint;
 
+    // Caches physics parts and disables old hinge joints.
     private void Awake()
     {
         Rigidbody = GetComponent<Rigidbody2D>();
@@ -27,11 +29,13 @@ public class RopeSegment2D : MonoBehaviour
         }
     }
 
+    // Sets the physical width of this rope segment.
     public void SetRadius(float radius)
     {
         _collider.radius = radius;
     }
 
+    // Connects this segment to the previous physics body.
     public void Connect(Rigidbody2D connectedBody, float distance)
     {
         _joint.autoConfigureConnectedAnchor = false;
@@ -45,6 +49,7 @@ public class RopeSegment2D : MonoBehaviour
         _joint.enableCollision = false;
     }
 
+    // Releases this segment from the previous rope part.
     public void DisconnectFromPrevious()
     {
         _joint.enabled = false;

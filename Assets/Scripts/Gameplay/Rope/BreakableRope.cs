@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
+// Breaks a rope when too many selected spheres stay on it.
 [DisallowMultipleComponent]
 public sealed class BreakableRope : MonoBehaviour
 {
@@ -18,11 +19,13 @@ public sealed class BreakableRope : MonoBehaviour
     private Coroutine breakCountdown;
     private bool isBroken;
 
+    // Finds the rope components used by this behaviour.
     private void Awake()
     {
         CacheReferences();
     }
 
+    // Starts tracking rope load and break events.
     private void OnEnable()
     {
         CacheReferences();
@@ -49,6 +52,7 @@ public sealed class BreakableRope : MonoBehaviour
         }
     }
 
+    // Stops event tracking and any pending break countdown.
     private void OnDisable()
     {
         if (loadSensor != null)
@@ -64,11 +68,13 @@ public sealed class BreakableRope : MonoBehaviour
         CancelBreakCountdown();
     }
 
+    // Refreshes component references when this component is added.
     private void Reset()
     {
         CacheReferences();
     }
 
+    // Keeps inspector values valid and refreshes the preview text.
     private void OnValidate()
     {
         maxLoad = Mathf.Max(1, maxLoad);
@@ -77,6 +83,7 @@ public sealed class BreakableRope : MonoBehaviour
         UpdateCapacityView(loadSensor != null ? loadSensor.LoadCount : 0);
     }
 
+    // Updates capacity feedback and starts breaking when overloaded.
     private void HandleLoadChanged(int loadCount)
     {
         if (isBroken)
@@ -96,6 +103,7 @@ public sealed class BreakableRope : MonoBehaviour
         }
     }
 
+    // Starts the delay before the overloaded rope breaks.
     private void BeginBreakCountdown()
     {
         if (breakCountdown != null)
@@ -112,6 +120,7 @@ public sealed class BreakableRope : MonoBehaviour
         breakCountdown = StartCoroutine(BreakAfterDelay());
     }
 
+    // Waits before checking whether the rope should still break.
     private IEnumerator BreakAfterDelay()
     {
         yield return new WaitForSeconds(breakDelay);
@@ -119,6 +128,7 @@ public sealed class BreakableRope : MonoBehaviour
         BreakIfStillOverloaded();
     }
 
+    // Breaks the rope only when its load is still over the limit.
     private void BreakIfStillOverloaded()
     {
         if (isBroken || loadSensor == null || loadSensor.LoadCount < maxLoad || ropeGenerator == null)
@@ -129,6 +139,7 @@ public sealed class BreakableRope : MonoBehaviour
         ropeGenerator.BreakFromMiddle();
     }
 
+    // Marks this object broken and hides its capacity view.
     private void HandleRopeBroken()
     {
         if (isBroken)
@@ -141,6 +152,7 @@ public sealed class BreakableRope : MonoBehaviour
         capacityView?.Hide();
     }
 
+    // Cancels a pending rope break delay.
     private void CancelBreakCountdown()
     {
         if (breakCountdown == null)
@@ -152,11 +164,13 @@ public sealed class BreakableRope : MonoBehaviour
         breakCountdown = null;
     }
 
+    // Displays how much more load the rope can carry.
     private void UpdateCapacityView(int loadCount)
     {
         capacityView?.SetRemainingCapacity(Mathf.Max(0, maxLoad - loadCount));
     }
 
+    // Finds related rope components when they are not assigned.
     private void CacheReferences()
     {
         if (ropeGenerator == null)

@@ -2,6 +2,7 @@ using PrimeTween;
 using TMPro;
 using UnityEngine;
 
+// Shows remaining rope capacity and warns before the rope breaks.
 [DisallowMultipleComponent]
 [RequireComponent(typeof(TextMeshPro))]
 public sealed class RopeCapacityView : MonoBehaviour
@@ -26,22 +27,26 @@ public sealed class RopeCapacityView : MonoBehaviour
     private bool isHidden;
     private bool isInitialized;
 
+    // Prepares the text and normal visual appearance.
     private void Awake()
     {
         EnsureInitialized();
         ApplyNormalVisuals();
     }
 
+    // Stops active warning animations when the view is removed.
     private void OnDestroy()
     {
         StopWarningAnimation();
     }
 
+    // Finds the text component after adding this view.
     private void Reset()
     {
         CacheText();
     }
 
+    // Keeps animation values valid in the inspector.
     private void OnValidate()
     {
         warningScaleMultiplier = Mathf.Max(1f, warningScaleMultiplier);
@@ -54,6 +59,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         }
     }
 
+    // Displays a new remaining capacity value and its warning state.
     public void SetRemainingCapacity(int remainingCapacity)
     {
         EnsureInitialized();
@@ -79,6 +85,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         }
     }
 
+    // Enables the counter and returns it to normal visuals.
     public void Show()
     {
         EnsureInitialized();
@@ -93,6 +100,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         }
     }
 
+    // Hides the counter after the rope breaks.
     public void Hide()
     {
         EnsureInitialized();
@@ -105,6 +113,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         }
     }
 
+    // Pulses the counter when only one capacity point remains.
     private void PlayWarningAnimation()
     {
         warningScaleTween = Tween.Scale(
@@ -126,6 +135,7 @@ public sealed class RopeCapacityView : MonoBehaviour
             cycleMode: CycleMode.Yoyo);
     }
 
+    // Stops warning tweens and restores normal visuals.
     private void StopWarningAnimation()
     {
         if (warningScaleTween.isAlive)
@@ -144,6 +154,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         ApplyNormalVisuals();
     }
 
+    // Finds the counter text if it was not assigned.
     private void CacheText()
     {
         if (counterText == null)
@@ -152,6 +163,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         }
     }
 
+    // Saves the starting scale before the view is used.
     private void EnsureInitialized()
     {
         if (isInitialized)
@@ -164,6 +176,7 @@ public sealed class RopeCapacityView : MonoBehaviour
         isInitialized = true;
     }
 
+    // Restores normal scale and text color.
     private void ApplyNormalVisuals()
     {
         if (!isInitialized)

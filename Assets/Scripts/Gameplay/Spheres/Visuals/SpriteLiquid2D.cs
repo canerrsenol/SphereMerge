@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Updates the liquid shader so it reacts to sphere movement.
 [DisallowMultipleComponent]
 public sealed class SpriteLiquid2D : MonoBehaviour
 {
@@ -54,11 +55,13 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         }
     }
 
+    // Changes the liquid and glow colors while keeping the outline color.
     public void SetLiquidColors(Color newLiquidColor, Color newGlowColor)
     {
         SetLiquidColors(newLiquidColor, newGlowColor, outlineColor);
     }
 
+    // Changes all main shader colors used by the liquid.
     public void SetLiquidColors(Color newLiquidColor, Color newGlowColor, Color newOutlineColor)
     {
         liquidColor = newLiquidColor;
@@ -70,24 +73,28 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         ApplyProperties();
     }
 
+    // Shows or hides the liquid outline.
     public void SetOutlineEnabled(bool enabled)
     {
         outlineEnabled = enabled;
         ApplyProperties();
     }
 
+    // Changes the thickness of the liquid outline.
     public void SetOutlineWidth(float width)
     {
         outlineWidth = Mathf.Max(0f, width);
         ApplyProperties();
     }
 
+    // Changes the color of the liquid outline.
     public void SetOutlineColor(Color color)
     {
         outlineColor = color;
         ApplyProperties();
     }
 
+    // Prepares renderer and physics references for animation.
     void Awake()
     {
         CacheRenderer();
@@ -102,12 +109,14 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         ApplyProperties();
     }
 
+    // Refreshes local references when this component is added.
     void Reset()
     {
         targetRigidbody = GetComponent<Rigidbody2D>();
         CacheRenderer();
     }
 
+    // Calculates tilt and offset from the current physics movement.
     void FixedUpdate()
     {
         if (targetRigidbody == null)
@@ -136,11 +145,13 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         liquidOffset = Vector2.ClampMagnitude(liquidOffset + liquidOffsetVelocity * fixedDeltaTime, MaxOffset);
     }
 
+    // Sends the latest liquid movement values to the renderer.
     void LateUpdate()
     {
         ApplyProperties();
     }
 
+    // Adds a quick liquid impulse when the sphere collides.
     void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.contactCount == 0)
@@ -151,6 +162,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         tiltVelocity += Mathf.Clamp(-localNormal.x * impulse, -MaxTilt, MaxTilt);
     }
 
+    // Keeps editor values valid and previews the material state.
     void OnValidate()
     {
         fillAmount = Mathf.Clamp01(fillAmount);
@@ -165,6 +177,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         }
     }
 
+    // Finds the child sprite renderer that displays liquid.
     void CacheRenderer()
     {
         if (targetRenderer != null)
@@ -194,6 +207,7 @@ public sealed class SpriteLiquid2D : MonoBehaviour
         targetRenderer = GetComponent<SpriteRenderer>();
     }
 
+    // Writes current visual and motion values to shader properties.
     void ApplyProperties()
     {
         CacheRenderer();

@@ -3,6 +3,7 @@ using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
+// Creates level instances and tracks the selected level index.
 public sealed class LevelManager : MonoBehaviour, ILevelService
 {
     private const string CurrentLevelKey = "CurrentLevel";
@@ -14,16 +15,20 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
     private GameObject currentLevelInstance;
     private LifetimeScope currentLevelScope;
     private LifetimeScope sceneScope;
+    private IGameStateService gameStateService;
 
     public int CurrentLevelIndex => currentLevelIndex;
     public event Action<int> LevelLoaded;
 
     [Inject]
-    public void Construct(LifetimeScope sceneScope)
+    // Receives scene services needed to create playable levels.
+    public void Construct(LifetimeScope sceneScope, IGameStateService gameStateService)
     {
         this.sceneScope = sceneScope;
+        this.gameStateService = gameStateService;
     }
 
+    // Restores the saved level index and prepares a level parent.
     private void Awake()
     {
         if (levelParent == null)
@@ -38,16 +43,19 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
         }
     }
 
+    // Loads the first current level after scene setup.
     private void Start()
     {
         LoadCurrentLevel();
     }
 
+    // Cleans up the current level when this manager is destroyed.
     private void OnDestroy()
     {
         DisposeCurrentLevel();
     }
 
+    // Recreates the currently selected level.
     public void LoadCurrentLevel()
     {
         if (!CanLoadLevel())
@@ -58,6 +66,7 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
         CreateLevel(currentLevelIndex);
     }
 
+    // Saves and creates the next level in the list.
     public void LoadNextLevel()
     {
         if (!CanLoadLevel())
@@ -77,6 +86,7 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
         CreateLevel(currentLevelIndex);
     }
 
+    // Builds a level instance and injects its level dependencies.
     private void CreateLevel(int levelIndex)
     {
         DisposeCurrentLevel();
@@ -105,8 +115,10 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
 
         currentLevelScope.Container.InjectGameObject(currentLevelInstance);
         LevelLoaded?.Invoke(currentLevelIndex);
+        gameStateService.ChangeState(GameState.Playing);
     }
 
+    // Destroys the level instance and disposes its dependency scope.
     private void DisposeCurrentLevel()
     {
         if (currentLevelScope != null)
@@ -122,6 +134,7 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
         }
     }
 
+    // Checks that required data and services exist before loading.
     private bool CanLoadLevel()
     {
         if (levelPrefabs == null || levelPrefabs.Length == 0)
@@ -133,6 +146,12 @@ public sealed class LevelManager : MonoBehaviour, ILevelService
         if (sceneScope == null)
         {
             Debug.LogError("Scene LifetimeScope is not injected into LevelManager.", this);
+            return false;
+        }
+
+        if (gameStateService == null)
+        {
+            Debug.LogError("IGameStateService is not injected into LevelManager.", this);
             return false;
         }
 

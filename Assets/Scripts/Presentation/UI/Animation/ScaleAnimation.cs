@@ -1,6 +1,7 @@
 using PrimeTween;
 using UnityEngine;
 
+// Scales a UI element in and then plays a soft loop animation.
 [DisallowMultipleComponent]
 public class ScaleAnimation : MonoBehaviour
 {
@@ -19,21 +20,25 @@ public class ScaleAnimation : MonoBehaviour
 
     private Transform Target => target != null ? target : transform;
 
+    // Saves the normal target scale before animation begins.
     private void Awake()
     {
         defaultScale = Target.localScale;
     }
 
+    // Plays the scale animation when this object becomes visible.
     private void OnEnable()
     {
         Play();
     }
 
+    // Stops animation when this object is hidden.
     private void OnDisable()
     {
         Stop();
     }
 
+    // Plays the entrance animation before the loop starts.
     private void Play()
     {
         Stop();
@@ -51,11 +56,13 @@ public class ScaleAnimation : MonoBehaviour
             .ChainCallback(this, StartLoopFromCallback, warnIfTargetDestroyed: false);
     }
 
+    // Starts looping through a tween callback.
     private static void StartLoopFromCallback(ScaleAnimation animation)
     {
         animation.StartLoop();
     }
 
+    // Repeats a small scale pulse while this object is active.
     private void StartLoop()
     {
         if (!isActiveAndEnabled)
@@ -74,6 +81,7 @@ public class ScaleAnimation : MonoBehaviour
             cycleMode: CycleMode.Yoyo);
     }
 
+    // Stops all scale animations and optionally restores scale.
     private void Stop()
     {
         if (enterSequence.isAlive)
@@ -96,6 +104,7 @@ public class ScaleAnimation : MonoBehaviour
         }
     }
 
+    // Keeps animation values valid in the inspector.
     private void OnValidate()
     {
         startScaleValue = Mathf.Max(0f, startScaleValue);

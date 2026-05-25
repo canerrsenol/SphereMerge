@@ -1,6 +1,7 @@
 using PrimeTween;
 using UnityEngine;
 
+// Plays feedback animations for a glass sphere visual.
 [DisallowMultipleComponent]
 public sealed class GlassSphereVisual2D : MonoBehaviour
 {
@@ -16,11 +17,13 @@ public sealed class GlassSphereVisual2D : MonoBehaviour
     private Sequence cannotSelectSequence;
     private Vector3 initialLocalPosition;
 
+    // Saves the normal position used after an animation.
     private void Awake()
     {
         initialLocalPosition = transform.localPosition;
     }
 
+    // Stops a running feedback animation before destruction.
     private void OnDestroy()
     {
         if (cannotSelectSequence.isAlive)
@@ -31,6 +34,7 @@ public sealed class GlassSphereVisual2D : MonoBehaviour
         cannotSelectSequence = default;
     }
 
+    // Shakes the sphere to show that it cannot be selected.
     public void PlayCannotSelectAnimation()
     {
         if (cannotSelectSequence.isAlive)
@@ -60,6 +64,7 @@ public sealed class GlassSphereVisual2D : MonoBehaviour
         cannotSelectSequence.Chain(Tween.LocalPosition(transform, initialLocalPosition, stepDuration, ease));
     }
 
+    // Creates a small random shake direction for feedback.
     private Vector3 GetRandomShakeOffset()
     {
         float shakeDistance = cannotSelectAnimationSettings != null

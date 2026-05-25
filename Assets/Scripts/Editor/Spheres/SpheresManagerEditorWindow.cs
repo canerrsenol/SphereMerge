@@ -4,8 +4,10 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
+// Provides a custom Unity editor for building sphere level grids.
 public sealed class SpheresManagerEditorWindow : EditorWindow
 {
+    // Lists how a painted obstacle should change a sphere cell.
     private enum ObstaclePaintMode
     {
         Keep,
@@ -26,6 +28,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
     private GUIStyle centeredCellLabel;
     private GUIStyle centeredSmallLabel;
 
+    // Opens the grid editor for a selected spheres manager.
     public static void Open(SpheresManager spheresManager)
     {
         SpheresManagerEditorWindow window = GetWindow<SpheresManagerEditorWindow>(WindowTitle);
@@ -33,12 +36,14 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         window.Show();
     }
 
+    // Prepares palette choices and GUI styles when the window opens.
     private void OnEnable()
     {
         CacheColorOptions();
         CreateStyles();
     }
 
+    // Draws all editor controls and the sphere grid.
     private void OnGUI()
     {
         CreateStyles();
@@ -78,12 +83,14 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         DrawGrid();
     }
 
+    // Sets the manager edited by this window.
     private void SetTarget(SpheresManager target)
     {
         spheresManager = target;
         titleContent = new GUIContent(WindowTitle);
     }
 
+    // Displays the current manager as a read-only field.
     private void DrawTargetField()
     {
         using (new EditorGUI.DisabledScope(true))
@@ -92,6 +99,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Draws buttons for selecting a sphere color to paint.
     private void DrawColorPalette()
     {
         CacheColorOptions();
@@ -116,6 +124,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    // Draws buttons for keeping, clearing, or painting obstacles.
     private void DrawObstaclePalette()
     {
         EditorGUILayout.LabelField("Obstacles", EditorStyles.boldLabel);
@@ -158,6 +167,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    // Draws one obstacle painting mode button.
     private static void DrawObstacleModeButton(string label, bool isSelected, Action onClick)
     {
         Color previousColor = GUI.backgroundColor;
@@ -171,6 +181,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         GUI.backgroundColor = previousColor;
     }
 
+    // Draws and applies size and spacing settings for the grid.
     private void DrawGridSettings()
     {
         EditorGUILayout.LabelField("Grid Settings", EditorStyles.boldLabel);
@@ -224,6 +235,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         Repaint();
     }
 
+    // Finds spheres that fall outside a smaller grid size.
     private List<GlassSphere2D> GetSpheresOutsideGrid(Vector2Int newGridSize)
     {
         List<GlassSphere2D> spheresOutsideGrid = new List<GlassSphere2D>();
@@ -249,6 +261,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return spheresOutsideGrid;
     }
 
+    // Deletes sphere objects removed by a grid resize.
     private void DestroySpheres(List<GlassSphere2D> spheresToDestroy)
     {
         if (spheresToDestroy == null)
@@ -266,6 +279,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Draws and applies the shared sphere color palette field.
     private void DrawSphereColorsField()
     {
         EditorGUI.BeginChangeCheck();
@@ -288,6 +302,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         Repaint();
     }
 
+    // Creates default spheres for every empty grid cell.
     private void FillEmptyGridCells()
     {
         if (spheresManager == null || !spheresManager.IsGridSizeValid || spheresManager.SpherePrefab == null)
@@ -325,6 +340,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Draws grid actions and current grid dimensions.
     private void DrawGridControls()
     {
         EditorGUILayout.BeginHorizontal();
@@ -340,6 +356,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
+    // Draws every editable cell in the sphere grid.
     private void DrawGrid()
     {
         Vector2Int gridSize = spheresManager.GridSize;
@@ -369,6 +386,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         EditorGUILayout.EndScrollView();
     }
 
+    // Draws one grid cell and handles its click action.
     private void DrawCell(Rect rect, Vector2Int position)
     {
         GlassSphere2D sphere = spheresManager.GetSphere(position);
@@ -387,6 +405,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Creates or updates the sphere in a clicked cell.
     private void PlaceOrUpdateSphere(Vector2Int position)
     {
         if (spheresManager == null || !spheresManager.IsPositionValid(position))
@@ -440,6 +459,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         Repaint();
     }
 
+    // Applies the selected obstacle paint mode to one sphere.
     private void ApplySelectedObstaclePaint(GlassSphere2D sphere, string undoName)
     {
         if (sphere == null)
@@ -466,6 +486,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Replaces a sphere obstacle with the selected prefab.
     private void SetSphereObstacle(GlassSphere2D sphere, ObstacleBaseAbstract obstaclePrefab, string undoName)
     {
         ClearSphereObstacles(sphere);
@@ -491,6 +512,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         MarkDirty(instanceObject.GetComponent<ObstacleBaseAbstract>());
     }
 
+    // Removes all obstacle objects attached to a sphere.
     private static void ClearSphereObstacles(GlassSphere2D sphere)
     {
         if (sphere == null)
@@ -525,6 +547,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Instantiates a sphere prefab for one grid cell.
     private GlassSphere2D CreateSphere(Vector2Int position)
     {
         GameObject prefabObject = spheresManager.SpherePrefab.gameObject;
@@ -549,6 +572,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return sphere;
     }
 
+    // Parents and positions a sphere inside its grid cell.
     private void SetupSphere(GlassSphere2D sphere, Vector2Int position)
     {
         if (sphere == null)
@@ -566,6 +590,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         sphere.SetColorPalette(spheresManager.SphereColors);
     }
 
+    // Gets the first obstacle currently attached to a sphere.
     private static ObstacleBaseAbstract GetSphereObstacle(GlassSphere2D sphere)
     {
         if (sphere == null)
@@ -586,6 +611,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return null;
     }
 
+    // Finds the child object that owns an obstacle instance.
     private static GameObject GetObstacleRootObject(Transform sphereTransform, Transform obstacleTransform)
     {
         if (sphereTransform == null || obstacleTransform == null)
@@ -602,6 +628,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return root.parent == sphereTransform ? root.gameObject : obstacleTransform.gameObject;
     }
 
+    // Builds the text shown inside one filled grid cell.
     private static string GetCellLabel(GlassSphere2D sphere, ObstacleBaseAbstract obstacle)
     {
         if (obstacle == null)
@@ -612,6 +639,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return $"{sphere.SphereColor}\n{GetObstacleLabel(obstacle)}";
     }
 
+    // Builds a readable editor name for an obstacle prefab.
     private static string GetObstacleLabel(ObstacleBaseAbstract obstacle)
     {
         if (obstacle == null)
@@ -623,6 +651,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return ObjectNames.NicifyVariableName(obstacleName);
     }
 
+    // Deletes all sphere objects and clears the grid data.
     private void ClearGrid()
     {
         if (spheresManager == null)
@@ -649,6 +678,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         Repaint();
     }
 
+    // Loads available sphere color options for painting.
     private void CacheColorOptions()
     {
         if (colorOptions != null && colorOptions.Length > 0)
@@ -663,6 +693,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Creates label styles used by the grid cells.
     private void CreateStyles()
     {
         if (centeredCellLabel == null)
@@ -686,12 +717,14 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Draws the fill and selection outline of a color button.
     private void DrawColorButtonBackground(Rect rect, SphereColors color, bool isSelected)
     {
         EditorGUI.DrawRect(rect, GetEditorColor(color));
         DrawRectOutline(rect, isSelected ? Color.white : new Color(0f, 0f, 0f, 0.35f), isSelected ? 3f : 1f);
     }
 
+    // Draws a simple border around an editor rectangle.
     private static void DrawRectOutline(Rect rect, Color color, float thickness)
     {
         EditorGUI.DrawRect(new Rect(rect.x, rect.y, rect.width, thickness), color);
@@ -700,6 +733,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         EditorGUI.DrawRect(new Rect(rect.xMax - thickness, rect.y, thickness, rect.height), color);
     }
 
+    // Gets a preview color from the active palette or defaults.
     private Color GetEditorColor(SphereColors color)
     {
         if (spheresManager != null && spheresManager.SphereColors != null)
@@ -714,6 +748,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         return defaultColor;
     }
 
+    // Records sphere visual changes so Unity can undo them.
     private void RecordChildLiquidObjects(string undoName)
     {
         if (spheresManager == null)
@@ -733,6 +768,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Records one liquid component for a later undo action.
     private static void RecordLiquidObject(GlassSphere2D sphere, string undoName)
     {
         if (sphere == null || sphere.SpriteLiquid == null)
@@ -743,6 +779,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         Undo.RecordObject(sphere.SpriteLiquid, undoName);
     }
 
+    // Marks all sphere visual data as modified in the editor.
     private void MarkChildLiquidObjectsDirty()
     {
         if (spheresManager == null)
@@ -764,6 +801,7 @@ public sealed class SpheresManagerEditorWindow : EditorWindow
         }
     }
 
+    // Marks an edited object and its prefab or scene as dirty.
     private static void MarkDirty(UnityEngine.Object target)
     {
         if (target == null)

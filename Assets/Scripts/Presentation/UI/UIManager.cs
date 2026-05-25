@@ -2,6 +2,7 @@ using PrimeTween;
 using UnityEngine;
 using VContainer;
 
+// Displays gameplay panels when the current game state changes.
 public sealed class UIManager : MonoBehaviour
 {
     [SerializeField] private GameObject backgroundPanel;
@@ -15,17 +16,20 @@ public sealed class UIManager : MonoBehaviour
     private bool subscribed;
 
     [Inject]
+    // Receives game and level services needed by the UI.
     public void Construct(IGameStateService gameStateService, ILevelService levelService)
     {
         this.gameStateService = gameStateService;
         this.levelService = levelService;
     }
 
+    // Tries to start listening for game state changes.
     private void OnEnable()
     {
         Subscribe();
     }
 
+    // Subscribes after injection and shows the current state.
     private void Start()
     {
         Subscribe();
@@ -36,12 +40,14 @@ public sealed class UIManager : MonoBehaviour
         }
     }
 
+    // Stops listening and cancels delayed panel changes.
     private void OnDisable()
     {
         Unsubscribe();
         StopPanelTransition();
     }
 
+    // Reloads the level after the retry button is pressed.
     public void OnRetryLevelButtonPressed()
     {
         if (gameStateService == null || levelService == null)
@@ -50,10 +56,10 @@ public sealed class UIManager : MonoBehaviour
             return;
         }
 
-        gameStateService.ChangeState(GameState.Playing);
         levelService.LoadCurrentLevel();
     }
 
+    // Loads the next level after the continue button is pressed.
     public void OnNextLevelButtonPressed()
     {
         if (gameStateService == null || levelService == null)
@@ -62,10 +68,10 @@ public sealed class UIManager : MonoBehaviour
             return;
         }
 
-        gameStateService.ChangeState(GameState.Playing);
         levelService.LoadNextLevel();
     }
 
+    // Starts listening to the game state service once available.
     private void Subscribe()
     {
         if (subscribed || gameStateService == null)
@@ -77,6 +83,7 @@ public sealed class UIManager : MonoBehaviour
         subscribed = true;
     }
 
+    // Stops listening to game state changes.
     private void Unsubscribe()
     {
         if (!subscribed || gameStateService == null)
@@ -88,6 +95,7 @@ public sealed class UIManager : MonoBehaviour
         subscribed = false;
     }
 
+    // Selects visible panels for the new game state.
     private void HandleGameStateChanged(GameState newState)
     {
         switch (newState)
@@ -115,6 +123,7 @@ public sealed class UIManager : MonoBehaviour
         }
     }
 
+    // Applies panel visibility now or after a delay.
     private void SetPanels(bool background, bool gameOver, bool win, float delay)
     {
         StopPanelTransition();
@@ -130,6 +139,7 @@ public sealed class UIManager : MonoBehaviour
             .ChainCallback(() => ApplyPanels(background, gameOver, win));
     }
 
+    // Cancels a delayed panel transition.
     private void StopPanelTransition()
     {
         if (!panelTransitionSequence.isAlive)
@@ -140,6 +150,7 @@ public sealed class UIManager : MonoBehaviour
         panelTransitionSequence.Stop();
     }
 
+    // Enables only the panels needed by the current screen.
     private void ApplyPanels(bool background, bool gameOver, bool win)
     {
         if (backgroundPanel != null)

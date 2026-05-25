@@ -1,5 +1,6 @@
 using UnityEngine;
 
+// Stores movement response values for the liquid shader animation.
 [CreateAssetMenu(fileName = "SpriteLiquidMotionSettings", menuName = "Sphere Merge/Sprite Liquid Motion Settings")]
 public sealed class SpriteLiquidMotionSettingsSO : ScriptableObject
 {
@@ -28,6 +29,7 @@ public sealed class SpriteLiquidMotionSettingsSO : ScriptableObject
     public float SpeedToOffset => speedToOffset;
     public float MaxOffset => maxOffset;
 
+    // Keeps liquid motion values inside safe ranges.
     private void OnValidate()
     {
         speedToTilt = Mathf.Max(0f, speedToTilt);

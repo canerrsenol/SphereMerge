@@ -1,6 +1,7 @@
 using PrimeTween;
 using UnityEngine;
 
+// Stores animation values for merging spheres.
 [CreateAssetMenu(fileName = "SphereMergeAnimationSettings", menuName = "Sphere Merge/Sphere Merge Animation Settings")]
 public sealed class SphereMergeAnimationSettingsSO : ScriptableObject
 {
@@ -14,6 +15,7 @@ public sealed class SphereMergeAnimationSettingsSO : ScriptableObject
     public Ease ScaleEase => scaleEase;
     public float TargetScale => targetScale;
 
+    // Keeps merge animation values inside valid ranges.
     private void OnValidate()
     {
         duration = Mathf.Max(0.01f, duration);

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using PrimeTween;
 using UnityEngine;
 
+// Finds connected matching spheres and merges groups of three.
 [DisallowMultipleComponent]
 public sealed class SpheresMergeManager : MonoBehaviour
     , ISpheresMergeManagerService
@@ -18,6 +19,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
     private readonly List<SphereContact> contacts = new List<SphereContact>();
     private readonly List<GlassSphere2D> mergeCandidates = new List<GlassSphere2D>(MergeCount);
 
+    // Stores a valid contact and checks both spheres for a merge.
     public void ReportSphereContact(GlassSphere2D first, GlassSphere2D second)
     {
         if (!CanUseContact(first, second))
@@ -35,11 +37,13 @@ public sealed class SpheresMergeManager : MonoBehaviour
         TryMerge(second);
     }
 
+    // Removes a contact after two spheres separate.
     public void ReportSphereContactEnded(GlassSphere2D first, GlassSphere2D second)
     {
         RemoveContact(first, second);
     }
 
+    // Starts a merge when a connected group can be made from a sphere.
     private void TryMerge(GlassSphere2D seed)
     {
         if (!CanMerge(seed))
@@ -58,6 +62,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         StartMerge(group);
     }
 
+    // Finds up to three connected spheres of the same color.
     private void FindFirstThreeConnectedSpheres(GlassSphere2D seed)
     {
         mergeCandidates.Clear();
@@ -90,6 +95,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         while (addedSphere && mergeCandidates.Count < MergeCount);
     }
 
+    // Adds one valid sphere to the current merge group.
     private bool TryAddCandidate(GlassSphere2D sphere, SphereColors color)
     {
         if (!CanMerge(sphere) || sphere.SphereColor != color || mergeCandidates.Contains(sphere))
@@ -101,6 +107,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         return true;
     }
 
+    // Marks spheres merged and animates them to a shared position.
     private void StartMerge(GlassSphere2D[] group)
     {
         float duration = mergeAnimationSettings != null ? mergeAnimationSettings.Duration : DefaultMergeDuration;
@@ -131,6 +138,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         sequence.ChainCallback(() => DestroyMergedSpheres(group));
     }
 
+    // Removes merged sphere objects after their animation.
     private void DestroyMergedSpheres(GlassSphere2D[] group)
     {
         for (int i = 0; i < group.Length; i++)
@@ -145,6 +153,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         }
     }
 
+    // Checks whether two spheres may form a contact for merging.
     private bool CanUseContact(GlassSphere2D first, GlassSphere2D second)
     {
         return CanMerge(first)
@@ -153,12 +162,14 @@ public sealed class SpheresMergeManager : MonoBehaviour
             && first.SphereColor == second.SphereColor;
     }
 
+    // Checks whether a sphere may currently be merged.
     private bool CanMerge(GlassSphere2D sphere)
     {
         return sphere != null
             && sphere.CurrentState == SphereState.Selected;
     }
 
+    // Checks whether a contact is already stored.
     private bool ContainsContact(SphereContact contact)
     {
         for (int i = 0; i < contacts.Count; i++)
@@ -172,6 +183,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         return false;
     }
 
+    // Removes the stored contact for a pair of spheres.
     private void RemoveContact(GlassSphere2D first, GlassSphere2D second)
     {
         for (int i = contacts.Count - 1; i >= 0; i--)
@@ -183,6 +195,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         }
     }
 
+    // Removes every stored contact that includes a sphere.
     private void RemoveContactsWith(GlassSphere2D sphere)
     {
         for (int i = contacts.Count - 1; i >= 0; i--)
@@ -194,6 +207,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
         }
     }
 
+    // Calculates the common target position of a merge group.
     private static Vector3 GetAveragePosition(GlassSphere2D[] group)
     {
         Vector3 total = Vector3.zero;
@@ -214,28 +228,33 @@ public sealed class SpheresMergeManager : MonoBehaviour
         return count > 0 ? total / count : Vector3.zero;
     }
 
+    // Stores a contact pair without caring about its order.
     private readonly struct SphereContact
     {
         public readonly GlassSphere2D First;
         public readonly GlassSphere2D Second;
 
+        // Creates a contact pair from two touching spheres.
         public SphereContact(GlassSphere2D first, GlassSphere2D second)
         {
             First = first;
             Second = second;
         }
 
+        // Checks whether this pair contains the same two spheres.
         public bool Matches(GlassSphere2D first, GlassSphere2D second)
         {
             return (First == first && Second == second)
                 || (First == second && Second == first);
         }
 
+        // Checks whether one sphere belongs to this contact.
         public bool Contains(GlassSphere2D sphere)
         {
             return First == sphere || Second == sphere;
         }
 
+        // Checks whether both spheres use the requested color.
         public bool HasColor(SphereColors color)
         {
             return First != null
@@ -244,6 +263,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
                 && Second.SphereColor == color;
         }
 
+        // Checks whether this contact connects to a sphere group.
         public bool TouchesAny(List<GlassSphere2D> spheres)
         {
             return spheres.Contains(First) || spheres.Contains(Second);

@@ -1,7 +1,9 @@
 using UnityEngine;
 
+// Lists the gameplay states a sphere can be in.
 public enum SphereState { Idle, IdleFirstInColumn, Selected, Merged }
 
+// Controls one selectable glass sphere and its gameplay state.
 [RequireComponent(typeof(Rigidbody2D))]
 public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 {
@@ -26,6 +28,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     public SphereColors SphereColor => sphereColor;
     public SpriteLiquid2D SpriteLiquid => spriteLiquid;
 
+    // Prepares physics, references, state, and visual color.
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
@@ -35,17 +38,20 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplySphereColor();
     }
 
+    // Finds connected components after adding the sphere.
     private void Reset()
     {
         CacheReferences();
     }
 
+    // Refreshes references and color changes made in the inspector.
     private void OnValidate()
     {
         CacheReferences();
         ApplySphereColor();
     }
 
+    // Shows an outline while a selected sphere touches a match.
     private void Update()
     {
         bool shouldShowOutline = currentState == SphereState.Selected
@@ -56,9 +62,10 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         SetOutlineVisible(shouldShowOutline);
     }
 
+    // Selects this sphere when it is available and not blocked.
     public void OnSelect()
     {
-        // Check if any click obstacles prevent selection
+        // Check whether any attached obstacle blocks selection.
         var clickObstacles = GetComponentsInChildren<IClickManipulatorObstacle>();
         foreach (var obstacle in clickObstacles)
         {
@@ -82,6 +89,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         EventBus.Publish(new SphereSelectedEvent(this));
     }
 
+    // Changes the sphere state and applies its gameplay behavior.
     public void SetSphereState(SphereState newState)
     {
         if (currentState == newState)
@@ -93,6 +101,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplyState(newState);
     }
 
+    // Changes this sphere color and refreshes its visual material.
     public void SetSphereColor(SphereColors color)
     {
         sphereColor = color;
@@ -100,6 +109,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplySphereColor();
     }
 
+    // Sets the color palette used by this sphere.
     public void SetColorPalette(SphereColorsSO palette)
     {
         colorPalette = palette;
@@ -107,6 +117,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         ApplySphereColor();
     }
 
+    // Finds optional visual and contact components.
     private void CacheReferences()
     {
         if (spriteLiquid == null)
@@ -127,6 +138,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         CacheColliders();
     }
 
+    // Stores the original enabled state of child colliders.
     private void CacheColliders(bool force = false)
     {
         Collider2D[] foundColliders = GetComponentsInChildren<Collider2D>(true);
@@ -144,6 +156,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         }
     }
 
+    // Applies physics and visuals for a given sphere state.
     private void ApplyState(SphereState state, bool forceOutline = false)
     {
         CacheReferences();
@@ -186,6 +199,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         }
     }
 
+    // Changes falling speed for selected or idle spheres.
     private void SetGravityScale(float gravityScale)
     {
         if (_rigidbody2D != null)
@@ -194,6 +208,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         }
     }
 
+    // Enables or pauses physics simulation for this sphere.
     private void SetRigidbodyActive(bool active)
     {
         if (_rigidbody2D == null)
@@ -210,6 +225,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         _rigidbody2D.simulated = active;
     }
 
+    // Enables contact detection only while matching is possible.
     private void SetContactSensorEnabled(bool enabled)
     {
         if (contactSensor != null)
@@ -218,6 +234,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         }
     }
 
+    // Enables or disables this sphere's original colliders.
     private void SetCollidersEnabled(bool enabled)
     {
         CacheColliders();
@@ -233,6 +250,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         }
     }
 
+    // Reads palette colors and sends them to the liquid view.
     private void ApplySphereColor()
     {
         CacheReferences();
@@ -254,6 +272,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         spriteLiquid.SetLiquidColors(liquidColor, glowColor, outlineColor);
     }
 
+    // Toggles the contact outline only when its value changes.
     private void SetOutlineVisible(bool visible, bool force = false)
     {
         if (!force && outlineVisible == visible)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using VContainer;
 
+// Fails a level when every tracked rope has broken.
 [DisallowMultipleComponent]
 public sealed class LevelRopeFailureObjective : MonoBehaviour
 {
@@ -11,11 +12,13 @@ public sealed class LevelRopeFailureObjective : MonoBehaviour
     private bool levelFailed;
 
     [Inject]
+    // Receives the service used to report level failure.
     public void Construct(IGameStateService gameStateService)
     {
         this.gameStateService = gameStateService;
     }
 
+    // Finds ropes and starts listening for their break events.
     private void OnEnable()
     {
         ropes = GetComponentsInChildren<RopeGenerator2D>(true);
@@ -35,6 +38,7 @@ public sealed class LevelRopeFailureObjective : MonoBehaviour
         TryFailLevel();
     }
 
+    // Stops listening for rope break events.
     private void OnDisable()
     {
         if (ropes == null)
@@ -51,12 +55,14 @@ public sealed class LevelRopeFailureObjective : MonoBehaviour
         }
     }
 
+    // Counts a newly broken rope and checks the objective.
     private void HandleRopeBroken()
     {
         brokenRopeCount++;
         TryFailLevel();
     }
 
+    // Changes the level state after all ropes have broken.
     private void TryFailLevel()
     {
         if (levelFailed || totalRopeCount == 0 || brokenRopeCount < totalRopeCount)

@@ -1,6 +1,7 @@
 using PrimeTween;
 using UnityEngine;
 
+// Stores animation values for spheres entering a level.
 [CreateAssetMenu(fileName = "SphereIntroAnimationSettings", menuName = "Sphere Merge/Sphere Intro Animation Settings")]
 public class SphereIntroAnimationSettingsSO : ScriptableObject
 {
@@ -12,6 +13,7 @@ public class SphereIntroAnimationSettingsSO : ScriptableObject
     public float Stagger => stagger;
     public Ease Ease => ease;
 
+    // Keeps animation values inside valid ranges.
     private void OnValidate()
     {
         duration = Mathf.Max(0.01f, duration);

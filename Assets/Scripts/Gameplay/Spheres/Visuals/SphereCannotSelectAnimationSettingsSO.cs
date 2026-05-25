@@ -1,6 +1,7 @@
 using PrimeTween;
 using UnityEngine;
 
+// Stores values for the cannot-select shake animation.
 [CreateAssetMenu(fileName = "SphereCannotSelectAnimationSettings", menuName = "Sphere Merge/Sphere Cannot Select Animation Settings")]
 public sealed class SphereCannotSelectAnimationSettingsSO : ScriptableObject
 {
@@ -16,6 +17,7 @@ public sealed class SphereCannotSelectAnimationSettingsSO : ScriptableObject
     public int ShakeStepCount => shakeStepCount;
     public Ease Ease => ease;
 
+    // Keeps shake animation values inside valid ranges.
     private void OnValidate()
     {
         duration = Mathf.Max(0.01f, duration);

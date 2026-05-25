@@ -2,6 +2,7 @@ using PrimeTween;
 using TMPro;
 using UnityEngine;
 
+// Reveals level end text with typing and scale feedback.
 [DisallowMultipleComponent]
 [RequireComponent(typeof(TextMeshProUGUI))]
 public class LevelEndTextAnimation : MonoBehaviour
@@ -20,6 +21,7 @@ public class LevelEndTextAnimation : MonoBehaviour
     private string cachedText;
     private Vector3 initialScale;
 
+    // Caches the original label text and scale.
     private void Awake()
     {
         if (textMeshProUGUI == null)
@@ -31,16 +33,19 @@ public class LevelEndTextAnimation : MonoBehaviour
         initialScale = transform.localScale;
     }
 
+    // Plays the animation whenever this text becomes visible.
     private void OnEnable()
     {
         Play();
     }
 
+    // Stops animations when the text is hidden.
     private void OnDisable()
     {
         Stop();
     }
 
+    // Starts the typewriter reveal and optional scale punch.
     private void Play()
     {
         Stop();
@@ -82,6 +87,7 @@ public class LevelEndTextAnimation : MonoBehaviour
         }
     }
 
+    // Stops active animations and restores normal visuals.
     private void Stop()
     {
         if (typewriterSequence.isAlive)
@@ -106,6 +112,7 @@ public class LevelEndTextAnimation : MonoBehaviour
         }
     }
 
+    // Keeps animation settings valid in the inspector.
     private void OnValidate()
     {
         if (textMeshProUGUI == null)

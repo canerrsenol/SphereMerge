@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+// Stores editable visual colors for every sphere color type.
 [CreateAssetMenu(fileName = "SphereColors", menuName = "Sphere Merge/Sphere Colors")]
 public class SphereColorsSO : ScriptableObject
 {
@@ -8,11 +9,13 @@ public class SphereColorsSO : ScriptableObject
 
     public SphereColorData[] Colors => colors;
 
+    // Gets liquid and glow colors for one sphere color.
     public bool TryGetColors(SphereColors sphereColor, out Color liquidColor, out Color glowColor)
     {
         return TryGetColors(sphereColor, out liquidColor, out glowColor, out _);
     }
 
+    // Gets all visual colors or returns safe default colors.
     public bool TryGetColors(SphereColors sphereColor, out Color liquidColor, out Color glowColor, out Color outlineColor)
     {
         for (int i = 0; i < colors.Length; i++)
@@ -35,16 +38,19 @@ public class SphereColorsSO : ScriptableObject
         return false;
     }
 
+    // Gets the liquid color used for one sphere type.
     public Color GetLiquidColor(SphereColors sphereColor)
     {
         return TryGetColors(sphereColor, out Color liquidColor, out _) ? liquidColor : GetDefaultLiquidColor(sphereColor);
     }
 
+    // Gets the outline color used for one sphere type.
     public Color GetOutlineColor(SphereColors sphereColor)
     {
         return TryGetColors(sphereColor, out _, out _, out Color outlineColor) ? outlineColor : GetDefaultOutlineColor(sphereColor);
     }
 
+    // Returns the built-in liquid color for a sphere type.
     public static Color GetDefaultLiquidColor(SphereColors sphereColor)
     {
         switch (sphereColor)
@@ -64,6 +70,7 @@ public class SphereColorsSO : ScriptableObject
         }
     }
 
+    // Returns the built-in glow color for a sphere type.
     public static Color GetDefaultGlowColor(SphereColors sphereColor)
     {
         switch (sphereColor)
@@ -83,6 +90,7 @@ public class SphereColorsSO : ScriptableObject
         }
     }
 
+    // Returns the built-in outline color for a sphere type.
     public static Color GetDefaultOutlineColor(SphereColors sphereColor)
     {
         switch (sphereColor)
@@ -103,6 +111,7 @@ public class SphereColorsSO : ScriptableObject
     }
 }
 
+// Stores the visual colors assigned to one sphere color type.
 [Serializable]
 public struct SphereColorData
 {

@@ -319,4 +319,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IceObstacle
   iceMeltCounterText: {fileID: 692536211833673917}
+  iceImage: {fileID: 7304935982157544296}
   selectSphereToMelt: 3
