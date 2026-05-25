@@ -132,7 +132,6 @@ GameObject:
   - component: {fileID: 50885431}
   - component: {fileID: 50885430}
   - component: {fileID: 50885433}
-  - component: {fileID: 50885434}
   m_Layer: 5
   m_Name: Button_Continue
   m_TagString: Untagged
@@ -204,9 +203,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 50885434}
-        m_TargetAssemblyTypeName: UIContinueButton, Assembly-CSharp
-        m_MethodName: OnContinueButtonClicked
+      - m_Target: {fileID: 1325156557}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnNextLevelButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -274,18 +273,6 @@ MonoBehaviour:
   loopHalfCycleDuration: 0.5
   loopEase: 1
   resetScaleOnDisable: 1
---- !u!114 &50885434
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 50885428}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 60e6d21caceac824ea2c972f7f8a4f73, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIContinueButton
 --- !u!1 &108707140
 GameObject:
   m_ObjectHideFlags: 0
@@ -1466,7 +1453,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LevelManager
   levelPrefabs:
-  - {fileID: 892343673480547444, guid: be21677c57aacc24b8e5ba37b41e1bfe, type: 3}
+  - {fileID: 4492338335543490156, guid: be21677c57aacc24b8e5ba37b41e1bfe, type: 3}
+  - {fileID: 1056469777770022499, guid: aa366afcd1d79624f824e0663990ba34, type: 3}
   levelParent: {fileID: 0}
 --- !u!1 &1371779593
 GameObject:
@@ -1855,7 +1843,6 @@ GameObject:
   - component: {fileID: 1959364584}
   - component: {fileID: 1959364583}
   - component: {fileID: 1959364586}
-  - component: {fileID: 1959364587}
   m_Layer: 5
   m_Name: Button_Retry
   m_TagString: Untagged
@@ -1927,9 +1914,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1959364587}
-        m_TargetAssemblyTypeName: UIRetryButton, Assembly-CSharp
-        m_MethodName: OnRetryButtonClicked
+      - m_Target: {fileID: 1325156557}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnRetryLevelButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1997,18 +1984,6 @@ MonoBehaviour:
   loopHalfCycleDuration: 0.5
   loopEase: 1
   resetScaleOnDisable: 1
---- !u!114 &1959364587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1959364581}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cae95b6fb69f02848a532094b6a4fd1f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UIRetryButton
 --- !u!1 &2030787524
 GameObject:
   m_ObjectHideFlags: 0
@@ -2174,6 +2149,6 @@ SceneRoots:
   - {fileID: 330585546}
   - {fileID: 410087041}
   - {fileID: 832575519}
-  - {fileID: 745835350}
   - {fileID: 1592574101}
   - {fileID: 1325156560}
+  - {fileID: 745835350}

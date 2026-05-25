@@ -12,7 +12,5 @@ public class GameSceneLifetimeScope : LifetimeScope
             .As<ILevelService>();
 
         builder.RegisterComponentInHierarchy<UIManager>();
-
-        builder.RegisterComponentInHierarchy<UILevelText>();
     }
 }

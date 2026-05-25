@@ -17,7 +17,7 @@ public sealed class GameManager : MonoBehaviour, IGameStateService
 
     public void ChangeState(GameState newState)
     {
-        if (currentState == newState)
+        if (currentState == newState || (IsTerminalState(currentState) && IsTerminalState(newState)))
         {
             return;
         }
@@ -34,5 +34,10 @@ public sealed class GameManager : MonoBehaviour, IGameStateService
     public bool IsState(GameState state)
     {
         return currentState == state;
+    }
+
+    private static bool IsTerminalState(GameState state)
+    {
+        return state == GameState.LevelCompleted || state == GameState.LevelFailed;
     }
 }
