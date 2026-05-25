@@ -124,6 +124,33 @@ public sealed class SpheresManager : SerializedMonoBehaviour
         return spheres[x, y];
     }
 
+    public int GetSphereCount()
+    {
+        EnsureGridDataSize();
+
+        if (!IsGridSizeValid || spheres == null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        int width = Mathf.Min(gridSize.x, spheres.GetLength(0));
+        int height = Mathf.Min(gridSize.y, spheres.GetLength(1));
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (spheres[x, y] != null)
+                {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
     public void SetSphere(Vector2Int position, GlassSphere2D sphere)
     {
         if (!TryGetArrayPosition(position, out int x, out int y))

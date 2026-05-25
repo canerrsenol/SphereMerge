@@ -132,6 +132,7 @@ GameObject:
   - component: {fileID: 50885431}
   - component: {fileID: 50885430}
   - component: {fileID: 50885433}
+  - component: {fileID: 50885434}
   m_Layer: 5
   m_Name: Button_Continue
   m_TagString: Untagged
@@ -156,8 +157,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 556}
-  m_SizeDelta: {x: 552.0959, y: 225.3673}
+  m_AnchoredPosition: {x: -0.000013351, y: 509}
+  m_SizeDelta: {x: 417.6741, y: 170.4959}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &50885430
 MonoBehaviour:
@@ -202,7 +203,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 50885431}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 50885434}
+        m_TargetAssemblyTypeName: UIContinueButton, Assembly-CSharp
+        m_MethodName: OnContinueButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &50885431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,6 +274,18 @@ MonoBehaviour:
   loopHalfCycleDuration: 0.5
   loopEase: 1
   resetScaleOnDisable: 1
+--- !u!114 &50885434
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 50885428}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60e6d21caceac824ea2c972f7f8a4f73, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIContinueButton
 --- !u!1 &108707140
 GameObject:
   m_ObjectHideFlags: 0
@@ -836,8 +861,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 105
-  m_fontSizeBase: 105
+  m_fontSize: 91
+  m_fontSizeBase: 91
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1089,6 +1114,7 @@ GameObject:
   - component: {fileID: 984854235}
   - component: {fileID: 984854238}
   - component: {fileID: 984854237}
+  - component: {fileID: 984854239}
   m_Layer: 5
   m_Name: TMP_MergeCount
   m_TagString: Untagged
@@ -1135,7 +1161,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0/10
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 52c319d4856b86642b90445d4964bacd, type: 2}
   m_sharedMaterial: {fileID: 8860882460591885793, guid: 52c319d4856b86642b90445d4964bacd, type: 2}
@@ -1215,6 +1241,19 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 984854234}
   m_CullTransparentMesh: 1
+--- !u!114 &984854239
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984854234}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7f52a95d3a341c59205a462fdfce701, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIMergeTrackerText
+  mergeCountText: {fileID: 984854237}
 --- !u!1 &1101509978
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,6 +1365,7 @@ MonoBehaviour:
   backgroundPanel: {fileID: 108707140}
   gameOverPanel: {fileID: 1256525291}
   winPanel: {fileID: 1101509978}
+  panelOpenDelay: 1
 --- !u!114 &1325156558
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1679,8 +1719,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -438}
-  m_SizeDelta: {x: 1018.253, y: 516.8214}
+  m_AnchoredPosition: {x: 0, y: -306}
+  m_SizeDelta: {x: 843.5099, y: 516.8214}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1831942682
 MonoBehaviour:
@@ -1729,8 +1769,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 160
-  m_fontSizeBase: 160
+  m_fontSize: 132
+  m_fontSizeBase: 132
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -1815,6 +1855,7 @@ GameObject:
   - component: {fileID: 1959364584}
   - component: {fileID: 1959364583}
   - component: {fileID: 1959364586}
+  - component: {fileID: 1959364587}
   m_Layer: 5
   m_Name: Button_Retry
   m_TagString: Untagged
@@ -1839,8 +1880,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 556}
-  m_SizeDelta: {x: 552.0959, y: 225.3673}
+  m_AnchoredPosition: {x: -0.000013351, y: 509}
+  m_SizeDelta: {x: 417.6741, y: 170.4959}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1959364583
 MonoBehaviour:
@@ -1885,7 +1926,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1959364584}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1959364587}
+        m_TargetAssemblyTypeName: UIRetryButton, Assembly-CSharp
+        m_MethodName: OnRetryButtonClicked
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1959364584
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1944,6 +1997,18 @@ MonoBehaviour:
   loopHalfCycleDuration: 0.5
   loopEase: 1
   resetScaleOnDisable: 1
+--- !u!114 &1959364587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1959364581}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cae95b6fb69f02848a532094b6a4fd1f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIRetryButton
 --- !u!1 &2030787524
 GameObject:
   m_ObjectHideFlags: 0
@@ -1979,8 +2044,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -438}
-  m_SizeDelta: {x: 854.9836, y: 516.8214}
+  m_AnchoredPosition: {x: 0, y: -306}
+  m_SizeDelta: {x: 744.3314, y: 516.8214}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &2030787526
 MonoBehaviour:
@@ -2029,8 +2094,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 180
-  m_fontSizeBase: 180
+  m_fontSize: 132
+  m_fontSizeBase: 132
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

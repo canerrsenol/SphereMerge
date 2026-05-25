@@ -1,3 +1,4 @@
+using PrimeTween;
 using UnityEngine;
 using VContainer;
 
@@ -6,9 +7,11 @@ public sealed class UIManager : MonoBehaviour
     [SerializeField] private GameObject backgroundPanel;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private GameObject winPanel;
+    [SerializeField, Min(0f)] private float panelOpenDelay = 1f;
 
     private IGameStateService gameStateService;
     private ILevelService levelService;
+    private Sequence panelTransitionSequence;
     private bool subscribed;
 
     [Inject]
@@ -36,6 +39,7 @@ public sealed class UIManager : MonoBehaviour
     private void OnDisable()
     {
         Unsubscribe();
+        StopPanelTransition();
     }
 
     public void OnRetryLevelButtonPressed()
@@ -90,28 +94,53 @@ public sealed class UIManager : MonoBehaviour
         {
             case GameState.Initializing:
             case GameState.Playing:
-                SetPanels(false, false, false);
+                SetPanels(false, false, false, 0f);
                 break;
 
             case GameState.Paused:
-                SetPanels(true, false, false);
+                SetPanels(true, false, false, panelOpenDelay);
                 break;
 
             case GameState.LevelCompleted:
-                SetPanels(true, false, true);
+                SetPanels(true, false, true, panelOpenDelay);
                 break;
 
             case GameState.LevelFailed:
-                SetPanels(true, true, false);
+                SetPanels(true, true, false, panelOpenDelay);
                 break;
 
             default:
-                SetPanels(false, false, false);
+                SetPanels(false, false, false, 0f);
                 break;
         }
     }
 
-    private void SetPanels(bool background, bool gameOver, bool win)
+    private void SetPanels(bool background, bool gameOver, bool win, float delay)
+    {
+        StopPanelTransition();
+
+        if (delay <= 0f)
+        {
+            ApplyPanels(background, gameOver, win);
+            return;
+        }
+
+        panelTransitionSequence = Sequence.Create()
+            .ChainDelay(delay)
+            .ChainCallback(() => ApplyPanels(background, gameOver, win));
+    }
+
+    private void StopPanelTransition()
+    {
+        if (!panelTransitionSequence.isAlive)
+        {
+            return;
+        }
+
+        panelTransitionSequence.Stop();
+    }
+
+    private void ApplyPanels(bool background, bool gameOver, bool win)
     {
         if (backgroundPanel != null)
         {

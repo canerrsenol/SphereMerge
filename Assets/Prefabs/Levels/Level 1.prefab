@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8519595287479775528}
   - component: {fileID: 7585177708923667456}
+  - component: {fileID: 5354143125070361594}
   m_Layer: 0
   m_Name: Level 1
   m_TagString: Untagged
@@ -50,6 +51,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelContext
   spheresManager: {fileID: 1266844100242553200}
   spheresMergeManager: {fileID: 8261291795213086353}
+--- !u!114 &5354143125070361594
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 892343673480547444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e4c3c539a9b4af6801c0326ef524b87, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LevelMergeObjective
 --- !u!1 &1836783701519100093
 GameObject:
   m_ObjectHideFlags: 0
