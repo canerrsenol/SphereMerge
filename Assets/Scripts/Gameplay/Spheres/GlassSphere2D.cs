@@ -4,7 +4,7 @@ using UnityEngine;
 public enum SphereState { Idle, IdleFirstInColumn, Selected, Merged }
 
 // Controls one selectable glass sphere and its gameplay state.
-[RequireComponent(typeof(Rigidbody2D))]
+[RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
 public sealed class GlassSphere2D : MonoBehaviour, ISelectable
 {
     [SerializeField] private SphereColors sphereColor;
@@ -14,10 +14,9 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     [SerializeField] private GlassSphereVisual2D sphereVisual;
 
     private Rigidbody2D _rigidbody2D;
+    private Collider2D _collider;
     private SphereState currentState = SphereState.Idle;
     private bool canSelect = false;
-    private Collider2D[] colliders;
-    private bool[] initialColliderEnabledStates;
     private bool outlineVisible;
 
     private const float IdleGravityScale = 0f;
@@ -32,8 +31,8 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _collider = GetComponent<Collider2D>();
         CacheReferences();
-        CacheColliders(true);
         ApplyState(currentState, true);
         ApplySphereColor();
     }
@@ -134,26 +133,6 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         {
             sphereVisual = GetComponentInChildren<GlassSphereVisual2D>(true);
         }
-
-        CacheColliders();
-    }
-
-    // Stores the original enabled state of child colliders.
-    private void CacheColliders(bool force = false)
-    {
-        Collider2D[] foundColliders = GetComponentsInChildren<Collider2D>(true);
-        if (!force && colliders != null && colliders.Length == foundColliders.Length)
-        {
-            return;
-        }
-
-        colliders = foundColliders;
-        initialColliderEnabledStates = new bool[colliders.Length];
-
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            initialColliderEnabledStates[i] = colliders[i] != null && colliders[i].enabled;
-        }
     }
 
     // Applies physics and visuals for a given sphere state.
@@ -166,7 +145,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
             case SphereState.Idle:
                 canSelect = false;
                 SetRigidbodyActive(true);
-                SetCollidersEnabled(true);
+                _collider.enabled = true;
                 SetGravityScale(IdleGravityScale);
                 SetContactSensorEnabled(false);
                 SetOutlineVisible(false, forceOutline);
@@ -175,7 +154,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
             case SphereState.IdleFirstInColumn:
                 canSelect = true;
                 SetRigidbodyActive(true);
-                SetCollidersEnabled(true);
+                _collider.enabled = true;
                 SetGravityScale(IdleGravityScale);
                 SetContactSensorEnabled(false);
                 SetOutlineVisible(false, forceOutline);
@@ -184,7 +163,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
             case SphereState.Selected:
                 canSelect = false;
                 SetRigidbodyActive(true);
-                SetCollidersEnabled(true);
+                _collider.enabled = true;
                 SetGravityScale(SelectedGravityScale);
                 SetContactSensorEnabled(true);
                 break;
@@ -194,7 +173,7 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
                 SetContactSensorEnabled(false);
                 SetOutlineVisible(true, forceOutline);
                 SetRigidbodyActive(false);
-                SetCollidersEnabled(false);
+                _collider.enabled = false;
                 break;
         }
     }
@@ -231,22 +210,6 @@ public sealed class GlassSphere2D : MonoBehaviour, ISelectable
         if (contactSensor != null)
         {
             contactSensor.enabled = enabled;
-        }
-    }
-
-    // Enables or disables this sphere's original colliders.
-    private void SetCollidersEnabled(bool enabled)
-    {
-        CacheColliders();
-
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            if (colliders[i] == null)
-            {
-                continue;
-            }
-
-            colliders[i].enabled = enabled && initialColliderEnabledStates[i];
         }
     }
 
