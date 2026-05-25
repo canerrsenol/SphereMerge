@@ -104,11 +104,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf605249ee056f4eb642b0c92f4d184, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GlassSphereVisual2D
-  duration: 0.18
-  shakeDistance: 0.04
-  verticalShakeDistance: 0.025
-  shakeStepCount: 3
-  ease: 3
+  cannotSelectAnimationSettings: {fileID: 11400000, guid: 3088ef2652a54348ba976612afce195d, type: 2}
 --- !u!1 &7688381267545841004
 GameObject:
   m_ObjectHideFlags: 0

@@ -7,11 +7,13 @@ public sealed class SpheresMergeManager : MonoBehaviour
     , ISpheresMergeManagerService
 {
     private const int MergeCount = 3;
+    private const float DefaultMergeDuration = 0.18f;
+    private const Ease DefaultMergePositionEase = Ease.InBack;
+    private const Ease DefaultMergeScaleEase = Ease.OutSine;
+    private const float DefaultMergeTargetScale = 0.35f;
 
     [Header("Animation")]
-    [Min(0.01f)][SerializeField] private float mergeDuration = 0.18f;
-    [SerializeField] private Ease mergeEase = Ease.InBack;
-    [SerializeField] private Ease mergeScaleEase = Ease.OutSine;
+    [SerializeField] private SphereMergeAnimationSettingsSO mergeAnimationSettings;
 
     private readonly List<SphereContact> contacts = new List<SphereContact>();
     private readonly List<GlassSphere2D> mergeCandidates = new List<GlassSphere2D>(MergeCount);
@@ -101,6 +103,10 @@ public sealed class SpheresMergeManager : MonoBehaviour
 
     private void StartMerge(GlassSphere2D[] group)
     {
+        float duration = mergeAnimationSettings != null ? mergeAnimationSettings.Duration : DefaultMergeDuration;
+        Ease positionEase = mergeAnimationSettings != null ? mergeAnimationSettings.PositionEase : DefaultMergePositionEase;
+        Ease scaleEase = mergeAnimationSettings != null ? mergeAnimationSettings.ScaleEase : DefaultMergeScaleEase;
+        float targetScale = mergeAnimationSettings != null ? mergeAnimationSettings.TargetScale : DefaultMergeTargetScale;
         Vector3 mergePosition = GetAveragePosition(group);
         Sequence sequence = Sequence.Create();
 
@@ -116,9 +122,9 @@ public sealed class SpheresMergeManager : MonoBehaviour
             RemoveContactsWith(sphere);
 
             Transform sphereTransform = sphere.transform;
-            sequence.Group(Tween.PositionX(sphereTransform, mergePosition.x, mergeDuration, mergeEase));
-            sequence.Group(Tween.PositionY(sphereTransform, mergePosition.y, mergeDuration, mergeEase));
-            sequence.Group(Tween.Scale(sphereTransform, Vector3.zero, mergeDuration, mergeScaleEase));
+            sequence.Group(Tween.PositionX(sphereTransform, mergePosition.x, duration, positionEase));
+            sequence.Group(Tween.PositionY(sphereTransform, mergePosition.y, duration, positionEase));
+            sequence.Group(Tween.Scale(sphereTransform, Vector3.one * targetScale, duration, scaleEase));
         }
 
         EventBus.Publish(new SpheresMergedEvent(group));

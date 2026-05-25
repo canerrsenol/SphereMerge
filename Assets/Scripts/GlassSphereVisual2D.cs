@@ -4,12 +4,14 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public sealed class GlassSphereVisual2D : MonoBehaviour
 {
+    private const float DefaultDuration = 0.18f;
+    private const float DefaultShakeDistance = 0.08f;
+    private const float DefaultVerticalShakeDistance = 0.05f;
+    private const int DefaultShakeStepCount = 3;
+    private const Ease DefaultEase = Ease.OutSine;
+
     [Header("Cannot Select Animation")]
-    [Min(0.01f)] [SerializeField] private float duration = 0.18f;
-    [Min(0f)] [SerializeField] private float shakeDistance = 0.08f;
-    [Min(0f)] [SerializeField] private float verticalShakeDistance = 0.05f;
-    [Min(1)] [SerializeField] private int shakeStepCount = 3;
-    [SerializeField] private Ease ease = Ease.OutSine;
+    [SerializeField] private SphereCannotSelectAnimationSettingsSO cannotSelectAnimationSettings;
 
     private Sequence cannotSelectSequence;
     private Vector3 initialLocalPosition;
@@ -38,6 +40,11 @@ public sealed class GlassSphereVisual2D : MonoBehaviour
 
         transform.localPosition = initialLocalPosition;
 
+        float duration = cannotSelectAnimationSettings != null ? cannotSelectAnimationSettings.Duration : DefaultDuration;
+        int shakeStepCount = cannotSelectAnimationSettings != null
+            ? cannotSelectAnimationSettings.ShakeStepCount
+            : DefaultShakeStepCount;
+        Ease ease = cannotSelectAnimationSettings != null ? cannotSelectAnimationSettings.Ease : DefaultEase;
         float stepDuration = duration / (shakeStepCount + 1);
         cannotSelectSequence = Sequence.Create();
 
@@ -55,6 +62,12 @@ public sealed class GlassSphereVisual2D : MonoBehaviour
 
     private Vector3 GetRandomShakeOffset()
     {
+        float shakeDistance = cannotSelectAnimationSettings != null
+            ? cannotSelectAnimationSettings.ShakeDistance
+            : DefaultShakeDistance;
+        float verticalShakeDistance = cannotSelectAnimationSettings != null
+            ? cannotSelectAnimationSettings.VerticalShakeDistance
+            : DefaultVerticalShakeDistance;
         Vector2 direction = Random.insideUnitCircle;
         if (direction.sqrMagnitude <= float.Epsilon)
         {

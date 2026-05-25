@@ -12,7 +12,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour
     private const float DefaultIntroDuration = 0.25f;
     private const float DefaultIntroStagger = 0.03f;
     private const Ease DefaultIntroEase = Ease.OutBack;
-    [SerializeField] private ObstacleBaseAbstract[] obstacles;
+    [SerializeField] private SphereObstacleCatalogSO obstacleCatalog;
     [SerializeField] private GlassSphere2D spherePrefab;
     [SerializeField] private SphereColorsSO sphereColors;
     [SerializeField, HideInInspector] private Vector2Int gridSize;
@@ -26,7 +26,7 @@ public sealed class SpheresManager : SerializedMonoBehaviour
 
     public GlassSphere2D SpherePrefab => spherePrefab;
     public SphereColorsSO SphereColors => sphereColors;
-    public IReadOnlyList<ObstacleBaseAbstract> Obstacles => obstacles;
+    public IReadOnlyList<ObstacleBaseAbstract> Obstacles => obstacleCatalog != null ? obstacleCatalog.Obstacles : null;
     public Vector2Int GridSize => gridSize;
     public Vector2 TileOffset => tileOffset;
     public bool IsGridSizeValid => gridSize.x > 0 && gridSize.y > 0;
