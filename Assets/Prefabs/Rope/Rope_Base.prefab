@@ -400,7 +400,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 57daf78e638844ed991ca8acd4e7b084, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BreakableRopeObstacle
+  m_EditorClassIdentifier: Assembly-CSharp::BreakableRope
   ropeGenerator: {fileID: 2730512552950984331}
   loadSensor: {fileID: 3766248132520761321}
   capacityView: {fileID: 3766248132520761317}
