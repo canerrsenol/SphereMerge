@@ -121,6 +121,7 @@ public sealed class SpheresMergeManager : MonoBehaviour
             sequence.Group(Tween.Scale(sphereTransform, Vector3.zero, mergeDuration, mergeScaleEase));
         }
 
+        EventBus.Publish(new SpheresMergedEvent(group));
         sequence.ChainCallback(() => DestroyMergedSpheres(group));
     }
 

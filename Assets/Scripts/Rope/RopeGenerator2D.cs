@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -26,7 +27,9 @@ public class RopeGenerator2D : MonoBehaviour
     private readonly List<RopeSegment2D> _segments = new();
     private int _breakSegmentIndex = -1;
 
-    private bool IsBroken => _breakSegmentIndex >= 0;
+    public bool IsBroken => _breakSegmentIndex >= 0;
+
+    public event Action Broken;
 
     private void Start()
     {
@@ -97,6 +100,7 @@ public class RopeGenerator2D : MonoBehaviour
         _segments[_breakSegmentIndex].DisconnectFromPrevious();
 
         UpdateLineRenderer();
+        Broken?.Invoke();
     }
 
     private void UpdateLineRenderer()
